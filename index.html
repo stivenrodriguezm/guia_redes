@@ -1,0 +1,3305 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Guía Proyecto Redes II</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Guía Proyecto Redes II</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: índice lateral fijo + columna de lectura; una tarjeta por equipo con su bloque de configuración listo para pegar */
+:root{
+  color-scheme:light;
+  --bg:#d9dee4; --surface:#e8ebef; --surface-2:#dfe3e8; --ink:#16212c; --muted:#4c5a6b; --line:#bfc7d1;
+  --accent:#1b5bc9; --accent-ink:#ffffff; --accent-soft:#d0dbec;
+  --rip:#b06800; --eigrp:#0a7f71; --ospf:#2a56bf; --vlan:#7743c2; --srv:#a3336c; --mon:#bf4510; --net:#4c6278;
+  --v10:#2c8a43; --v20:#c03a35; --v30:#8a4fd0; --v40:#a87706; --v99:#4c6278;
+  --ok:#1d8749; --bad:#c03a35; --warn:#a87706;
+  --code-bg:#111924; --code-ink:#dbe5f1; --code-dim:#8197ad; --code-line:#223142;
+  --mark-bg:#ffd166; --mark-ink:#1a1200; --mark-ok-bg:#2a6b48; --mark-ok-ink:#e6fff0;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+  --r:8px;
+}
+:root.modo-oscuro{
+  --bg:#0d1218; --surface:#141b23; --surface-2:#18212b; --ink:#e2e8ef; --muted:#93a3b5; --line:#273343;
+  --accent:#6d9fff; --accent-ink:#0b1017; --accent-soft:#1a2740;
+  --rip:#f0a43a; --eigrp:#3cc4b1; --ospf:#7d9dff; --vlan:#b48cf2; --srv:#e27aaf; --mon:#f08a4b; --net:#9fb2c6;
+  --v10:#5cc777; --v20:#f07670; --v30:#b48cf2; --v40:#e3b23c; --v99:#9fb2c6;
+  --ok:#4cc883; --bad:#f07670; --warn:#e3b23c;
+  --code-bg:#090e14; --code-ink:#dbe5f1; --code-dim:#7d91a6; --code-line:#1d2936;
+  --mark-bg:#ffd166; --mark-ink:#1a1200; --mark-ok-bg:#2a6b48; --mark-ok-ink:#e6fff0;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:16px}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+body{background:var(--bg); color:var(--ink); font:15px/1.6 var(--f-body)}
+a{color:var(--accent)}
+a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+h1,h2,h3,h4{font-family:var(--f-display); text-wrap:balance; line-height:1.2; margin:0}
+h1{font-size:clamp(1.8rem, 4vw, 2.6rem); font-weight:800; letter-spacing:-.01em}
+h2{font-size:1.55rem; font-weight:800}
+h3{font-size:1.12rem; font-weight:700}
+h4{font-size:.98rem; font-weight:700}
+p{margin:0}
+code{font-family:var(--f-mono); font-size:.88em}
+p code, li code, td code{background:var(--surface-2); border:1px solid var(--line); border-radius:4px; padding:0 .3em}
+.eyebrow{font:600 .72rem/1 var(--f-body); letter-spacing:.09em; text-transform:uppercase; color:var(--muted)}
+
+/* ---------- estructura ---------- */
+.shell{display:grid; grid-template-columns:250px minmax(0,1fr); gap:40px; max-width:1260px; margin:0 auto;
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); padding-block:28px 80px}
+.toc{position:sticky; top:calc(env(safe-area-inset-top, 0px) + 16px); align-self:start; max-height:calc(100vh - 32px); overflow:auto;
+  display:flex; flex-direction:column; gap:14px; padding-right:4px}
+.toc .brand{font:800 1rem/1.2 var(--f-display)}
+.modo{display:inline-flex; align-items:center; gap:8px; align-self:flex-start; font:600 .8rem var(--f-body); color:var(--ink);
+  background:var(--surface); border:1px solid var(--line); padding:6px 11px; border-radius:6px; cursor:pointer}
+.modo:hover{border-color:var(--muted)}
+.modo .dot{width:10px; height:10px; border-radius:50%; background:var(--ink); box-shadow:inset -3px 0 0 var(--surface)}
+.toc nav{display:flex; flex-direction:column; gap:2px}
+.toc a{display:flex; gap:8px; align-items:baseline; text-decoration:none; color:var(--ink); padding:5px 8px; border-radius:6px; font-size:.9rem}
+.toc a:hover{background:var(--surface)}
+.toc a .n{font:500 .75rem var(--f-mono); color:var(--muted); min-width:1.6em}
+.toc .prog{display:flex; flex-direction:column; gap:6px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:10px 12px; font-size:.82rem; color:var(--muted)}
+.bar{height:6px; border-radius:3px; background:var(--line); overflow:hidden}
+.bar i{display:block; height:100%; width:0; background:var(--ok); transition:width .3s}
+main{min-width:0; display:flex; flex-direction:column; gap:56px}
+section{display:flex; flex-direction:column; gap:18px; min-width:0}
+.sec-head{display:flex; flex-direction:column; gap:6px; border-top:2px solid var(--ink); padding-top:14px}
+.sec-head .eyebrow{color:var(--accent)}
+.lead{color:var(--muted); max-width:70ch}
+.prose{max-width:76ch}
+ol.steps > li{min-width:0}
+ol.steps .code, ol.steps .tbl{margin-block:8px 4px}
+ol.steps, ul.plain{margin:0; padding-left:1.3em; display:flex; flex-direction:column; gap:6px}
+
+/* ---------- hero ---------- */
+.hero{display:flex; flex-direction:column; gap:14px}
+.hero .sub{font-size:1.05rem; color:var(--muted); max-width:66ch}
+.legend{display:flex; flex-wrap:wrap; gap:8px}
+
+/* ---------- tags ---------- */
+.tag{display:inline-flex; align-items:center; gap:6px; font:600 .72rem/1 var(--f-body); letter-spacing:.04em; text-transform:uppercase;
+  padding:5px 8px; border-radius:999px; border:1px solid currentColor; white-space:nowrap}
+.tag::before{content:""; width:7px; height:7px; border-radius:50%; background:currentColor}
+.t-rip{color:var(--rip)} .t-eigrp{color:var(--eigrp)} .t-ospf{color:var(--ospf)} .t-vlan{color:var(--vlan)}
+.t-srv{color:var(--srv)} .t-mon{color:var(--mon)} .t-net{color:var(--net)}
+.v10{color:var(--v10)} .v20{color:var(--v20)} .v30{color:var(--v30)} .v40{color:var(--v40)} .v99{color:var(--v99)}
+
+/* ---------- datos del usuario ---------- */
+.vars{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:16px; display:flex; flex-direction:column; gap:12px}
+.vars-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(210px,1fr)); gap:12px}
+.field{display:flex; flex-direction:column; gap:4px; min-width:0}
+.field label{font-size:.8rem; font-weight:600}
+.field input{font:500 .92rem var(--f-mono); padding:8px 10px; border:1px solid var(--line); border-radius:6px; background:var(--surface-2); color:var(--ink); width:100%}
+.field small{color:var(--muted); font-size:.76rem}
+
+/* ---------- callouts ---------- */
+.note{border-left:3px solid var(--accent); background:var(--accent-soft); padding:10px 14px; border-radius:0 6px 6px 0; display:flex; flex-direction:column; gap:6px; max-width:80ch}
+.note.warn{border-color:var(--warn); background:var(--surface)}
+.note.bad{border-color:var(--bad); background:var(--surface)}
+.note b:first-child{font-family:var(--f-display)}
+
+/* ---------- tablas ---------- */
+.tbl{overflow-x:auto; border:1px solid var(--line); border-radius:var(--r); background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:.86rem; font-variant-numeric:tabular-nums}
+th,td{padding:7px 10px; text-align:left; border-bottom:1px solid var(--line); vertical-align:top}
+th{font:600 .72rem var(--f-body); letter-spacing:.06em; text-transform:uppercase; color:var(--muted); background:var(--surface-2); position:sticky; top:0}
+tr:last-child td{border-bottom:0}
+td.m{font-family:var(--f-mono); font-size:.82rem; white-space:nowrap}
+.ok-t{color:var(--ok); font-weight:600} .bad-t{color:var(--bad); font-weight:600}
+
+/* ---------- timeline ---------- */
+.plan{display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:10px; counter-reset:p}
+.plan li{list-style:none; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:12px 14px; display:flex; flex-direction:column; gap:4px; counter-increment:p}
+.plan li::before{content:"Paso " counter(p); font:600 .7rem var(--f-mono); color:var(--accent); letter-spacing:.05em; text-transform:uppercase}
+.plan{padding:0; margin:0}
+.plan b{font-family:var(--f-display)}
+.plan span{color:var(--muted); font-size:.85rem}
+
+/* ---------- tarjetas de equipo ---------- */
+.devs{display:flex; flex-direction:column; gap:18px}
+.dev{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; min-width:0}
+.dev-h{display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--line)}
+.dev-h .id{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.dev-h h3{font-size:1.1rem}
+.dev-h .img{font:500 .78rem var(--f-mono); color:var(--muted)}
+.dev-b{padding:12px 16px 16px; display:flex; flex-direction:column; gap:12px; min-width:0}
+.ifs{display:flex; flex-wrap:wrap; gap:6px 14px; font:500 .8rem var(--f-mono); color:var(--muted)}
+.ifs span b{color:var(--ink); font-weight:500}
+.done{display:inline-flex; align-items:center; gap:6px; font-size:.82rem; color:var(--muted); cursor:pointer; user-select:none}
+.done input{accent-color:var(--ok); width:16px; height:16px}
+.dev.is-done .dev-h{background:var(--surface-2)}
+.dev.is-done h3::after{content:" ✓"; color:var(--ok)}
+.mini{display:grid; grid-template-columns:repeat(auto-fit, minmax(250px,1fr)); gap:12px}
+.mini .dev-h{padding:9px 12px} .mini .dev-b{padding:10px 12px 12px}
+
+/* ---------- código ---------- */
+.code{position:relative; min-width:0}
+.code .cap{display:flex; justify-content:space-between; align-items:center; gap:8px; background:var(--code-bg); color:var(--code-dim);
+  font:500 .72rem var(--f-mono); padding:7px 8px 0 12px; border-radius:6px 6px 0 0}
+pre{margin:0; background:var(--code-bg); color:var(--code-ink); padding:10px 12px 14px; border-radius:0 0 6px 6px; overflow-x:auto; max-height:560px;
+  font:400 .8rem/1.55 var(--f-mono); tab-size:2}
+pre code{font-size:inherit; background:none; border:0; padding:0; color:inherit}
+.code.tall pre{max-height:none}
+.copy{font:600 .72rem var(--f-body); letter-spacing:.03em; border:1px solid var(--code-line); background:transparent; color:var(--code-ink);
+  padding:4px 10px; border-radius:5px; cursor:pointer}
+.copy:hover{border-color:var(--code-dim)}
+.copy.ok{color:var(--mark-ok-ink); background:var(--mark-ok-bg); border-color:var(--mark-ok-bg)}
+mark.ph{background:var(--mark-bg); color:var(--mark-ink); border-radius:3px; padding:0 2px}
+mark.ph.ok{background:var(--mark-ok-bg); color:var(--mark-ok-ink)}
+.phi{font-family:var(--f-mono); font-size:.9em; background:var(--mark-bg); color:var(--mark-ink); border-radius:3px; padding:0 3px}
+.phi.ok{background:var(--accent-soft); color:var(--ink)}
+
+/* ---------- tabs ---------- */
+details.alt{border:1px dashed var(--line); border-radius:6px; padding:8px 12px}
+details.alt summary{cursor:pointer; font-weight:600; font-size:.88rem}
+details.alt[open] summary{margin-bottom:10px}
+
+/* ---------- diagrama ---------- */
+.diagram{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); overflow-x:auto; padding:8px}
+.diagram svg{display:block; min-width:900px; width:100%; height:auto}
+.dz{fill:var(--surface-2); stroke:var(--line)}
+.dzl{font:700 13px var(--f-display); fill:var(--muted); letter-spacing:.06em}
+.dn{stroke-width:2; fill:var(--surface)}
+.dn.r{stroke:var(--ink)} .dn.mk{stroke:var(--ospf); stroke-dasharray:4 3} .dn.sw{stroke:var(--vlan)}
+.dt{font:700 12px var(--f-body); fill:var(--ink); text-anchor:middle}
+.ds{font:500 10.5px var(--f-mono); fill:var(--muted); text-anchor:middle}
+.dsl{font:500 10.5px var(--f-mono); fill:var(--muted)}
+.lk{stroke-width:2.4; fill:none}
+.lk.rip{stroke:var(--rip)} .lk.eigrp{stroke:var(--eigrp)} .lk.ospf{stroke:var(--ospf)} .lk.tr{stroke:var(--vlan)} .lk.lan{stroke:var(--muted); stroke-width:1.5}
+.lk.wan{stroke:var(--net); stroke-dasharray:6 4}
+.lb{font:500 10.5px var(--f-mono); fill:var(--ink); paint-order:stroke; stroke:var(--surface-2); stroke-width:4px}
+.lb.rip{fill:var(--rip)} .lb.eigrp{fill:var(--eigrp)} .lb.ospf{fill:var(--ospf)} .lb.tr{fill:var(--vlan)}
+
+/* ---------- checklist ---------- */
+.checks{display:flex; flex-direction:column; gap:0; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); overflow:hidden}
+.ck{display:grid; grid-template-columns:28px 34px minmax(0,1fr); gap:6px 10px; padding:10px 14px; border-bottom:1px solid var(--line); align-items:start}
+.ck:last-child{border-bottom:0}
+.ck input{width:18px; height:18px; margin-top:2px; accent-color:var(--ok)}
+.ck .num{font:600 .8rem var(--f-mono); color:var(--muted); padding-top:2px}
+.ck .what{display:flex; flex-direction:column; gap:3px; min-width:0}
+.ck .what b{font-weight:600}
+.ck .how{font-size:.84rem; color:var(--muted)}
+.ck .how code{font-size:.8rem}
+.ck.on{background:var(--surface-2)}
+.ck.on .what b{text-decoration:line-through; text-decoration-color:var(--ok)}
+
+.qa{display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); gap:12px}
+.q{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:14px 16px; display:flex; flex-direction:column; gap:8px; align-items:flex-start; min-width:0}
+.q h4{font-size:1rem}
+.q p{color:var(--ink); font-size:.9rem}
+.toast{position:fixed; right:calc(16px + env(safe-area-inset-right, 0px)); bottom:calc(16px + env(safe-area-inset-bottom, 0px)); background:var(--ink); color:var(--bg);
+  padding:9px 14px; border-radius:6px; font-size:.86rem; opacity:0; transform:translateY(8px); transition:.2s; pointer-events:none; max-width:min(420px, calc(100vw - 32px)); z-index:20}
+.toast.show{opacity:1; transform:none}
+
+@media (max-width: 920px){
+  .shell{grid-template-columns:minmax(0,1fr); gap:24px}
+  .toc{position:static; max-height:none}
+  .toc nav{display:grid; grid-template-columns:repeat(auto-fill, minmax(170px,1fr))}
+}
+</style>
+<script>try{ if (localStorage.getItem('redes2:modo') === 'oscuro') document.documentElement.classList.add('modo-oscuro'); }catch(e){}</script>
+
+<div class="shell">
+<aside class="toc" aria-label="Índice">
+  <div class="brand">Proyecto Final · Redes II</div>
+  <button type="button" class="modo" id="modo" aria-pressed="false"><span class="dot"></span><span id="modo-txt">Modo oscuro</span></button>
+  <nav>
+    <a href="#plan"><span class="n">00</span>Plan de ataque</a>
+    <a href="#prep"><span class="n">01</span>Preparación</a>
+    <a href="#auto"><span class="n">A</span>Atajo: lab automático</a>
+    <a href="#topo"><span class="n">02</span>Construir topología</a>
+    <a href="#ips"><span class="n">03</span>Direccionamiento</a>
+    <a href="#borde"><span class="n">04</span>R2, switches y servidores</a>
+    <a href="#rip"><span class="n">05</span>R1 y LAN Pamplona</a>
+    <a href="#eigrp"><span class="n">06</span>Dominio EIGRP</a>
+    <a href="#ospf"><span class="n">07</span>Dominio OSPF</a>
+    <a href="#hosts"><span class="n">08</span>PCs (VPCS)</a>
+    <a href="#srv"><span class="n">09</span>Servidor de monitoreo</a>
+    <a href="#zbx"><span class="n">10</span>Zabbix</a>
+    <a href="#graf"><span class="n">11</span>Grafana</a>
+    <a href="#n8n"><span class="n">12</span>Telegram + n8n</a>
+    <a href="#tests"><span class="n">13</span>Pruebas</a>
+    <a href="#evid"><span class="n">14</span>Evidencias</a>
+    <a href="#fix"><span class="n">15</span>Si algo falla</a>
+    <a href="#preg"><span class="n">16</span>Preguntas de sustentación</a>
+  </nav>
+  <div class="prog">
+    <span id="p-dev">Equipos configurados: 0</span>
+    <div class="bar"><i id="b-dev"></i></div>
+    <span id="p-ev">Evidencias: 0 / 23</span>
+    <div class="bar"><i id="b-ev"></i></div>
+  </div>
+</aside>
+
+<main>
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <span class="eyebrow">PNETLab · MobaXterm · Guía del estudiante</span>
+  <h1>Proyecto final Redes II, de cero a sustentación</h1>
+  <p class="sub">RIPv2, EIGRP y OSPF multimarca integrados con redistribución, NAT, EtherChannel, ACL por VLAN, monitoreo con Zabbix y Grafana, y un bot de Telegram con n8n. Cada equipo tiene su configuración completa en un solo bloque: lo abres en MobaXterm, pegas y pasas al siguiente.</p>
+  <div class="legend">
+    <span class="tag t-rip">RIP v2</span><span class="tag t-eigrp">EIGRP 100</span><span class="tag t-ospf">OSPF multiárea</span>
+    <span class="tag t-vlan">VLAN / switching</span><span class="tag t-srv">Servidores</span><span class="tag t-mon">Monitoreo</span>
+  </div>
+
+  <div class="vars" id="vars">
+    <div class="eyebrow">Tus datos · se rellenan solos en todos los bloques de código</div>
+    <div class="vars-grid">
+      <div class="field"><label for="in-wan">IP WAN de R2 (Ethernet0/3)</label><input id="in-wan" placeholder="ej. 192.168.80.131" autocomplete="off" spellcheck="false"><small>Sale de <code>show ip interface brief</code> en R2 (paso 4).</small></div>
+      <div class="field"><label for="in-gw">Gateway de Internet (Cloud0)</label><input id="in-gw" placeholder="ej. 192.168.80.2" autocomplete="off" spellcheck="false"><small>Sale de <code>show dhcp lease</code> en R2.</small></div>
+      <div class="field"><label for="in-bot">Token del bot de Telegram</label><input id="in-bot" placeholder="123456789:AA…" autocomplete="off" spellcheck="false"><small>Lo creas casi al final (sección 12).</small></div>
+      <div class="field"><label for="in-chat">Tu Chat ID de Telegram</label><input id="in-chat" placeholder="ej. 987654321" autocomplete="off" spellcheck="false"><small>También en la sección 12.</small></div>
+    </div>
+    <p class="lead" style="font-size:.84rem">Los valores se guardan solo en este navegador. Mientras un dato esté vacío verás un marcador amarillo como <mark class="ph">‹IP_WAN_R2›</mark> dentro del código; cuando lo llenes se pone verde.</p>
+  </div>
+</header>
+
+<!-- ================= 00 PLAN ================= -->
+<section id="plan">
+  <div class="sec-head"><span class="eyebrow">00 · Plan de ataque</span><h2>El orden que ahorra más tiempo</h2></div>
+  <p class="lead">La instalación de Zabbix, Grafana y n8n es lo único que tarda (descargas). Por eso se monta primero el borde de Internet y el servidor, y mientras el servidor instala, configuras el resto de routers.</p>
+  <ol class="plan">
+    <li><b>PNETLab</b><span>Imágenes, RAM y red de VMware. ≈ 10 min</span></li>
+    <li><b>Topología y configuraciones</b><span>Con el atajo automático ≈ 15 min; a mano, secciones 02–08 ≈ 90 min.</span></li>
+    <li><b>R2, SW1, SW2</b><span>Internet, VLAN, ACL, NAT y EtherChannel. ≈ 10 min</span></li>
+    <li><b>SRV-MON</b><span>IP, SSH y lanzar los scripts de instalación. Corren solos ≈ 20 min</span></li>
+    <li><b>Servidores, R1 y EIGRP</b><span>Mientras instala: DNS, WEB, DHCP, R1, R3–R8. ≈ 20 min</span></li>
+    <li><b>OSPF + MikroTik</b><span>R9, R10, R11 y PCs. ≈ 15 min</span></li>
+    <li><b>Zabbix, Grafana y Telegram</b><span>Agregar equipos, crear el bot, alertas y flujo n8n. ≈ 25 min</span></li>
+    <li><b>Pruebas y capturas</b><span>Checklist de 23 evidencias. ≈ 40 min</span></li>
+  </ol>
+  <div class="note">
+    <b>Decisiones de diseño (para justificar en el informe)</b>
+    <ul class="plain">
+      <li><b>R1-Pamplona</b> es el router frontera RIP ↔ EIGRP y <b>R3-Paipa</b> el frontera EIGRP ↔ OSPF. Solo hay un punto de redistribución entre cada par de dominios, así no se forman bucles de rutas.</li>
+      <li><b>R2-Pamplona</b> es el router de borde: ruta estática por defecto hacia Cloud0, NAT con sobrecarga (PAT) y la ruta por defecto se anuncia por RIP (<code>default-information originate</code>), llega a EIGRP por redistribución y R3 la inyecta en OSPF.</li>
+      <li><b>OSPF multiárea</b>: área 0 = R3, R9, R10; área 1 = enlace R10–R11 y LAN Sogamoso. R10 es el ABR. El equipo multimarca (MikroTik CHR) va en R11, el extremo de la cadena, como recomendó el profesor: si falla, no tumba el resto.</li>
+      <li><b>EtherChannel LACP</b> (Po1, 2 enlaces) entre Switch1 y Switch2, troncal 802.1Q.</li>
+      <li>Se agrega la <b>VLAN 99 de gestión</b> (192.168.99.0/24) para el servidor Zabbix/Grafana/n8n. El PDF trata Gestión como zona aparte, y así el monitoreo no choca con la regla “VLAN 10 nunca a VLAN 40”.</li>
+      <li>DNS1, Servidor web y DHCP son routers IOL livianos con <code>ip dns server</code>, <code>ip http server</code> y <code>ip dhcp pool</code>: consumen poca RAM y se configuran pegando un bloque.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= 01 PREP ================= -->
+<section id="prep">
+  <div class="sec-head"><span class="eyebrow">01 · Preparación</span><h2>Antes de abrir PNETLab</h2></div>
+
+  <h3>1. Red de VMware (evita el error más común)</h3>
+  <div class="note warn">
+    <b>Revisa la IP de tu máquina PNETLab.</b>
+    <p>Cloud0 entrega a R2 una IP de la misma red NAT de VMware donde vive PNETLab (ej. 192.168.80.x). Si el tercer octeto de esa red es <b>5, 6, 7, 10, 15, 16–25, 30, 40, 50 o 99</b>, choca con el direccionamiento del proyecto. En ese caso: VMware → Edit → Virtual Network Editor → VMnet8 → cambia la subred a otra (ej. 192.168.80.0) y reinicia la VM.</p>
+  </div>
+
+  <h3>2. Descargar las imágenes</h3>
+  <article class="dev" data-dev="img">
+    <div class="dev-h"><div class="id"><h3>Imágenes del proyecto con ishare2</h3><span class="tag t-net">SSH a PNETLab · root / pnet</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-img">Hecho</label></div>
+    <div class="dev-b">
+      <p>Conéctate con MobaXterm: <b>Session → SSH</b>, host = IP de PNETLab, usuario <code>root</code>, clave <code>pnet</code>.</p>
+      <ol class="steps">
+        <li><b>Instala ishare2</b> (solo si al escribir <code>ishare2</code> sale “command not found”).
+          <div class="code"><div class="cap"><span>Instalar</span></div><pre><code>curl https://ishare2.sh/install | sh</code></pre></div></li>
+        <li><b>Busca las imágenes.</b> Pega una línea a la vez y anota el número de la columna ID.
+          <div class="code"><div class="cap"><span>Buscar</span></div><pre><code>ishare2 search bin
+ishare2 search qemu mikrotik
+ishare2 search qemu ubuntu</code></pre></div></li>
+        <li><b>Descarga las cuatro</b> escribiendo el comando con el número que anotaste:
+          <div class="tbl"><table>
+            <thead><tr><th>Imagen</th><th>Qué elegir en la lista</th><th>Comando (ejemplo)</th></tr></thead>
+            <tbody>
+              <tr><td>IOL L3 · routers y servidores</td><td>nombre con <b>L3</b>, ej. i86bi_LinuxL3-AdvEnterpriseK9</td><td class="m">ishare2 pull bin 12</td></tr>
+              <tr><td>IOL L2 · switches</td><td>nombre con <b>L2</b>, ej. i86bi_LinuxL2-AdvEnterpriseK9</td><td class="m">ishare2 pull bin 13</td></tr>
+              <tr><td>MikroTik · R11</td><td>la 7.x más nueva (ej. mikrotik-7.17)</td><td class="m">ishare2 pull qemu 45</td></tr>
+              <tr><td>Ubuntu · SRV-MON</td><td>Ubuntu <b>server</b> 20.04, 22.04 o 24.04 (no desktop)</td><td class="m">ishare2 pull qemu 87</td></tr>
+            </tbody>
+          </table></div>
+          Los números del ejemplo son inventados: cámbialos por los que te salieron.</li>
+        <li><b>Arregla permisos</b> cuando terminen las descargas.
+          <div class="code"><div class="cap"><span>Permisos</span></div><pre><code>/opt/unetlab/wrappers/unl_wrapper -a fixpermissions</code></pre></div></li>
+      </ol>
+    </div>
+  </article>
+  <ul class="plain">
+    <li><b>RAM:</b> la VM de PNETLab necesita al menos 12 GB (ideal 16 GB) y 4 núcleos. Los IOL consumen poco; el Ubuntu necesita 4 GB.</li>
+    <li>Anota el usuario y contraseña de la imagen Ubuntu (ishare2 / la tienda de PNETLab los muestra; suelen ser <code>root</code>/<code>root</code> o <code>ubuntu</code>/<code>ubuntu</code>).</li>
+  </ul>
+
+  <h3>3. MobaXterm para copiar y pegar</h3>
+  <ol class="steps">
+    <li>En el login de PNETLab elige <b>consola nativa</b> (Native console / telnet) si te aparece la opción. Al hacer clic en un nodo se abrirá <code>telnet://IP_PNETLAB:PUERTO</code>.</li>
+    <li>Si el clic no abre MobaXterm, crea la sesión a mano: <b>Session → Telnet</b>, host = IP de PNETLab, puerto = el del nodo (lo ves en la URL telnet del nodo; en PNETLab suele ser 32768 + ID del nodo).</li>
+    <li>Pegar en MobaXterm: <b>clic derecho</b> o <b>Shift+Insert</b>. Pega un bloque completo y espera a que termine antes de pasar al siguiente.</li>
+    <li>Truco para verificar todo al final: <b>MultiExec</b> (botón en la barra de MobaXterm) escribe el mismo comando en todas las pestañas, por ejemplo <code>write memory</code>.</li>
+  </ol>
+  <div class="note">
+    <b>Al encender un IOL por primera vez</b>
+    <p>Si pregunta <code>Would you like to enter the initial configuration dialog? [yes/no]</code>, escribe <code>no</code> y Enter antes de pegar. Todos los bloques empiezan con <code>enable</code> / <code>configure terminal</code> y terminan con <code>write memory</code>.</p>
+  </div>
+</section>
+
+<!-- ================= ATAJO ================= -->
+<section id="auto">
+  <div class="sec-head"><span class="eyebrow">Atajo · reemplaza las secciones 02 a 08</span><h2>Lab listo en un solo paso</h2></div>
+  <p class="lead">Un bloque que pegas en la consola de PNETLab crea el laboratorio <b>ProyectoFinal-Redes2</b> con los 38 nodos, los 40 cables y la configuración de arranque de cada router, switch, servidor y PC. Las configuraciones son exactamente las de las secciones 04 a 08. Son tres pasos: crear el lab, encenderlo y cargar las configuraciones con un script.</p>
+  <article class="dev" data-dev="auto1">
+    <div class="dev-h"><div class="id"><h3>Paso 1 · Crear el lab</h3><span class="tag t-net">consola de PNETLab (root)</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-auto">Hecho</label></div>
+    <div class="dev-b">
+      <ol class="steps">
+        <li>Descarga primero las imágenes (sección 01, punto 2): IOL L3, IOL L2, MikroTik y Ubuntu.</li>
+        <li>En MobaXterm abre SSH a la IP de PNETLab como <code>root</code> y pega el bloque. Al final te muestra las cuatro imágenes que detectó; ninguna debe quedar vacía.</li>
+        <li>En la web de PNETLab abre el lab <b>ProyectoFinal-Redes2</b> (está en la carpeta principal de labs; si no aparece, recarga la página). Todavía no lo enciendas: sigue con el paso 2.</li>
+      </ol>
+      <div class="code"><div class="cap"><span>Pegar en la consola de PNETLab</span></div><pre><code>cat &gt; /tmp/redes2-lab.b64 &lt;&lt;'B64'
+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
+ns2+f90ufv09Gax5icFy/2Ow/2OwzhUMtphy8+XAEKffUet9x3fia2T3nlW4bHeT7BLisirndGJmjKvPKT2sKd+Oi8/4Gf+GO33c
+F+N152ft+SF15gNnep4wbPC7C/8xwOMx78c9o5yQfUv+jbfFg/5h2z1RyOovc7/l8g33DLG2/G8FjXwt1oOY6Dllnt/Tf+6fPcPf
+Ijv37y1uOsEYC84MzsU8a/Lu7OGezfYikCHt+WSyv/PZ6yvC525V4Gns5vRbDhI9Hp6mPb/Elntgsj/j2lTsM03AtHlrNarRp/tN
+u2f4KeeFOdzSuHR+WEr1GyeBFVhaMnOKFc47sKKcOnPKl11je2Cc03t5rs6FyNZOVnXI9naKSMXIQ2LfeJZDAiMPt++bQulIlfgG
+8Sf3f2A4nZl4x8wn55oqodaAedQVa1BXzFXQWRl5f6O8HUL294bqBfbUrO8J6cHfHe6JJZ/Nt94FDOu03tlKdgem85b/FwMjjXcL
+WzFT/rOg3RmrWxpNEXfhe5HbjL3ndruNLdjfKrxNHNzkDStJY8JoVtyoYvRaVsgAzO+CLBR1xr+FVP/e5+zfxTOzJ279Cqmzu953
+++zpPAilo2olR1Sl0nnQGe5XyZH7UQn+NHbrOpDbZXWk5M+v5PDUMbt/f/JR/CrOY8dTHd+pavBro4vvVKGs+wQnYyh+X5zb64u9
+cKo1AXW7gp3Zw39sR4irRAwYfzdBn9wjkO/sTK+2379+7Ie8XHnTfvy7TydedrwfHaKLFt7FO9uD698FS0NzmH9eR1pTsMPv2DiV
+qXs6TR+i/Cpp0bGavleHbp5w07j8mlWw21147+L8f03n2kSafUU5eS+4hZrk5p73Rdw6gT7n5Hg4K8fDzXI8XCfHmH3sNLK8jt+D
+zOi9Tq1pxPqjw97yBAeauMgcRbwkt//MPD6HmkYyrw9er//87ccf1lD787f/BysjdMtBuQAA
+B64
+LAB=/opt/unetlab/labs/ProyectoFinal-Redes2.unl
+IOLD=/opt/unetlab/addons/iol/bin; QD=/opt/unetlab/addons/qemu
+L3=$(ls $IOLD | grep -i '\.bin$' | grep -vi 'l2' | head -1)
+L2=$(ls $IOLD | grep -i '\.bin$' | grep -i 'l2' | head -1)
+MK=$(ls $QD | grep -i mikrotik | sort -V | tail -1)
+UB=$(ls $QD | grep -i ubuntu | grep -i server | sort -V | tail -1)
+[ -z "$UB" ] &amp;&amp; UB=$(ls $QD | grep -i ubuntu | sort -V | tail -1)
+base64 -d /tmp/redes2-lab.b64 | gunzip &gt; "$LAB"
+sed -i "s|@IOL_L3@|$L3|g; s|@IOL_L2@|$L2|g; s|@MIKROTIK@|$MK|g; s|@UBUNTU@|$UB|g" "$LAB"
+/opt/unetlab/wrappers/unl_wrapper -a fixpermissions
+echo "IOL L3:   $L3"; echo "IOL L2:   $L2"; echo "MikroTik: $MK"; echo "Ubuntu:   $UB"
+echo "Lab creado en $LAB"</code></pre></div>
+      <p>Si alguna imagen sale vacía, descárgala con ishare2 y vuelve a pegar el bloque (reemplaza el lab).</p>
+    </div>
+  </article>
+
+  <article class="dev" data-dev="auto2">
+    <div class="dev-h"><div class="id"><h3>Paso 2 · Encender y cargar todas las configuraciones</h3><span class="tag t-net">consola de PNETLab (root) · ≈ 3 min</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-auto2">Hecho</label></div>
+    <div class="dev-b">
+      <p>PNETLab no aplica solo las configuraciones guardadas en el lab: los equipos arrancan como <code>Router</code>. Este script las escribe por la consola de cada equipo, todos a la vez: configuración completa, llaves SSH y <code>write memory</code>.</p>
+      <ol class="steps">
+        <li>En PNETLab: <b>More actions → Start all nodes</b> y espera unos 2 minutos.</li>
+        <li>En la misma sesión SSH de PNETLab (root) pega el bloque completo.</li>
+        <li>Al final muestra una tabla con cada equipo y <b>OK</b>. Si alguno no estaba encendido o queda en <b>REVISAR</b>, enciéndelo y corre otra vez <code>python3 /root/cargar-configs.py</code>; volver a correrlo no daña nada.</li>
+      </ol>
+      <div class="code"><div class="cap"><span>Pegar en la consola de PNETLab</span></div><pre><code>cat &gt; /root/cargar-configs.py &lt;&lt;'EOF'
+#!/usr/bin/env python3
+# Carga la configuracion de cada equipo del lab ProyectoFinal-Redes2 por su consola telnet.
+import base64, glob, os, re, socket, subprocess, sys, threading, time
+import xml.etree.ElementTree as ET
+
+labs = glob.glob('/opt/unetlab/labs/**/ProyectoFinal-Redes2.unl', recursive=True)
+if not labs:
+    sys.exit('No encuentro ProyectoFinal-Redes2.unl dentro de /opt/unetlab/labs')
+root = ET.parse(labs[0]).getroot()
+LAB_ID = root.get('id') or ''
+NODES = {n.get('id'): n.get('name') for n in root.iter('node')}
+TYPES = {n.get('id'): n.get('type') for n in root.iter('node')}
+CFGS = {c.get('id'): base64.b64decode(c.text or '').decode() for c in root.iter('config')}
+
+def find_ports():
+    out = subprocess.run(['ss', '-ltnp'], stdout=subprocess.PIPE, universal_newlines=True).stdout
+    ports = {}
+    for line in out.splitlines():
+        m = re.search(r':(\d+)\s+\S+\s+users:\(\("[^"]+",pid=(\d+)', line)
+        if not m:
+            continue
+        port, pid = int(m.group(1)), m.group(2)
+        nid = None
+        try:
+            cwd = os.readlink('/proc/%s/cwd' % pid)
+            base = os.path.basename(cwd.rstrip('/'))
+            if base.isdigit() and (LAB_ID in cwd or '/unetlab/tmp/' in cwd):
+                nid = base
+        except OSError:
+            pass
+        if nid is None:
+            try:
+                args = [a.decode(errors='ignore') for a in open('/proc/%s/cmdline' % pid, 'rb').read().split(b'\0')]
+                if '-D' in args:
+                    nid = args[args.index('-D') + 1]
+            except (OSError, IndexError):
+                pass
+        if nid in NODES and (nid not in ports or port &lt; ports[nid]):
+            ports[nid] = port
+    return ports
+
+def clean(b):
+    out, i = bytearray(), 0
+    while i &lt; len(b):
+        if b[i] == 255 and i + 1 &lt; len(b):
+            if b[i + 1] in (251, 252, 253, 254):
+                i += 3
+                continue
+            if b[i + 1] == 250:
+                j = b.find(bytes([255, 240]), i)
+                i = j + 2 if j != -1 else len(b)
+                continue
+            i += 2
+            continue
+        out.append(b[i])
+        i += 1
+    return out.decode(errors='ignore')
+
+class Con:
+    def __init__(self, port):
+        self.k = socket.create_connection(('127.0.0.1', port), timeout=5)
+        self.k.settimeout(0.2)
+        self.log = ''
+    def read(self, wait):
+        end, data = time.time() + wait, b''
+        while time.time() &lt; end:
+            try:
+                d = self.k.recv(65536)
+                if not d:
+                    break
+                data += d
+            except socket.timeout:
+                pass
+        t = clean(data)
+        self.log += t
+        return t
+    def send(self, line, wait=0.15):
+        self.k.sendall(line.encode() + b'\r')
+        return self.read(wait)
+
+def do_ios(c, name, cfg):
+    t = c.send('', 2)
+    for _ in range(6):
+        low = t.lower()
+        if 'initial configuration dialog' in low:
+            t = c.send('no', 5); continue
+        if 'terminate autoinstall' in low:
+            t = c.send('yes', 3); continue
+        if re.search(r'[&gt;#]\s*$', t):
+            break
+        t = c.send('', 2)
+    c.send('enable', 0.5)
+    c.send('configure terminal', 0.5)
+    for line in cfg.splitlines():
+        if line.strip() != 'end':
+            c.send(line, 0.12)
+    c.send('end', 0.8)
+    if name.startswith('R'):
+        c.send('configure terminal', 0.5)
+        t = c.send('crypto key generate rsa modulus 1024', 5)
+        if 'replace' in t.lower():
+            c.send('no', 2)
+        c.send('ip ssh version 2', 0.5)
+        c.send('end', 0.8)
+    c.send('write memory', 5)
+    return name in c.send('', 1.5)
+
+def do_vpcs(c, name, cfg):
+    c.send('', 1)
+    for line in cfg.splitlines():
+        c.send(line, 4 if 'dhcp' in line else 0.6)
+    c.send('save', 1.5)
+    return name in c.send('', 1)
+
+results = {}
+def worker(nid, port):
+    name = NODES[nid]
+    try:
+        c = Con(port)
+        fn = do_vpcs if TYPES[nid] == 'vpcs' else do_ios
+        results[name] = 'OK' if fn(c, name, CFGS[nid]) else 'REVISAR (el prompt no muestra el nombre)'
+        c.k.close()
+    except Exception as e:
+        results[name] = 'ERROR: %s' % e
+
+ports = find_ports()
+todo = [(nid, ports[nid]) for nid in CFGS if nid in ports]
+missing = sorted(NODES[nid] for nid in CFGS if nid not in ports)
+print('Lab: %s' % labs[0])
+print('Equipos encendidos encontrados: %d de %d. Configurando (1-2 min)...' % (len(todo), len(CFGS)))
+if not todo:
+    print('\nNo encontre consolas. Enciende los nodos (Start all nodes) y vuelve a correrlo.')
+    print('Si ya estan encendidos, mandale esta salida a Claude:')
+    os.system("ss -ltnp | grep -Ei 'wrapper|vpcs|qemu|iol' | head -20")
+    sys.exit(1)
+threads = [threading.Thread(target=worker, args=x) for x in todo]
+for th in threads:
+    th.start()
+for th in threads:
+    th.join()
+print('')
+for name in sorted(results):
+    print('  %-20s %s' % (name, results[name]))
+if missing:
+    print('\nNo encontre la consola de: ' + ', '.join(missing))
+    print('Encienden esos nodos y vuelve a correr:  python3 /root/cargar-configs.py')
+print('\nFaltan a mano: R11-SOGAMOSO (MikroTik, seccion 07) y la ruta estatica de R2 (seccion 04, bloque 2).')
+EOF
+python3 /root/cargar-configs.py</code></pre></div>
+      <p>Si dice <code>No encontre consolas</code>, copia lo que imprime debajo y pásaselo a Claude: es la única parte que depende de la versión de PNETLab.</p>
+    </div>
+  </article>
+
+  <article class="dev" data-dev="auto3">
+    <div class="dev-h"><div class="id"><h3>Paso 3 · Lo que queda a mano</h3><span class="tag t-net">≈ 5 min</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-auto3">Hecho</label></div>
+    <div class="dev-b">
+      <ol class="steps">
+        <li><b>R2:</b> pega el <b>bloque 2</b> de la sección 04 (ruta estática hacia Internet), después de leer la IP y el gateway con <code>show dhcp lease</code>.</li>
+        <li><b>R11 MikroTik:</b> pega su bloque de la sección 07.</li>
+        <li><b>Prueba rápida</b> desde PC-MEDELLIN: <code>ping 192.168.15.10</code> y, cuando R11 esté listo, <code>ping 192.168.7.13</code>. Después sigue en la sección 09.</li>
+      </ol>
+      <div class="note warn"><b>Si algo no carga</b>
+        <p>Si un nodo da error al encender (pasa a veces con los QEMU, MikroTik o Ubuntu), bórralo y créalo a mano con el mismo nombre y los mismos cables (tabla de la sección 02). Si un equipo no queda configurado, pégale su bloque de las secciones 04 a 08.</p>
+      </div>
+    </div>
+  </article>
+
+  <h3>Texto para el informe (metodología)</h3>
+  <div class="code"><div class="cap"><span>Pegar en el documento</span></div><pre><code>Despliegue automatizado. Para reducir errores de digitación y el tiempo de montaje, la topología se definió como un archivo de laboratorio de PNETLab (.unl, formato XML) que contiene los 38 nodos, sus 40 enlaces y la configuración de arranque (startup-config) de cada router Cisco IOL, switch, servidor y VPCS. Las configuraciones se diseñaron y validaron por dominio (RIP, EIGRP y OSPF) y se integraron en el archivo. Un script en Python, ejecutado en el servidor de PNETLab, lee esas configuraciones y las aplica por la consola telnet de cada equipo en paralelo, incluida la generación de llaves RSA para SSH y el guardado con write memory, de modo que el laboratorio es reproducible: si un equipo falla, basta con volver a ejecutar el script para regresar al estado documentado. Los pasos que dependen del entorno se aplicaron a mano: la ruta estática hacia el gateway de Internet y la configuración del router MikroTik. Todo se verificó con los comandos show, ping y traceroute de la sección de pruebas.</code></pre></div>
+</section>
+
+<!-- ================= 02 TOPO ================= -->
+<section id="topo">
+  <div class="sec-head"><span class="eyebrow">02 · Construir topología</span><h2>Nodos y cables en PNETLab</h2></div>
+  <p class="lead">Crea un lab nuevo (ej. <code>ProyectoFinal-Redes2</code>). Agrega los nodos con <b>clic derecho → Node</b> y nómbralos exactamente como en la tabla (el nombre coincide con el hostname y con Zabbix).</p>
+
+  <div class="diagram" role="img" aria-label="Diagrama de la topología: dominio OSPF arriba, EIGRP abajo a la izquierda, RIP y VLAN abajo a la derecha">
+  <svg viewBox="0 0 1100 650" xmlns="http://www.w3.org/2000/svg">
+    <rect class="dz" x="8" y="8" width="1084" height="150" rx="8"/>
+    <text class="dzl" x="22" y="30">OSPF MULTIÁREA · R9 R10 (ABR) R11 MikroTik</text>
+    <rect class="dz" x="8" y="172" width="520" height="470" rx="8"/>
+    <text class="dzl" x="22" y="194">EIGRP · AS 100</text>
+    <rect class="dz" x="540" y="172" width="552" height="470" rx="8"/>
+    <text class="dzl" x="554" y="194">RIP v2 · VLAN · CONTROL DE ACCESO</text>
+    <!-- enlaces OSPF -->
+    <line class="lk ospf" x1="90" y1="72" x2="480" y2="72"/>
+    <line class="lk ospf" x1="480" y1="72" x2="870" y2="72"/>
+    <line class="lk ospf" x1="90" y1="72" x2="90" y2="350"/>
+    <text class="lb ospf" x="285" y="64" text-anchor="middle">10.0.0.0/30 · área 0</text>
+    <text class="lb ospf" x="675" y="64" text-anchor="middle">10.0.0.4/30 · área 1</text>
+    <text class="lb ospf" x="98" y="230">192.168.24.0/30</text>
+    <!-- LAN OSPF -->
+    <line class="lk lan" x1="90" y1="72" x2="160" y2="120"/><text class="dsl" x="166" y="124">S4 · 192.168.5.0/24 · PC-9 .11</text>
+    <line class="lk lan" x1="480" y1="72" x2="550" y2="120"/><text class="dsl" x="556" y="124">S5 · 192.168.6.0/24 · PC-10 .12</text>
+    <line class="lk lan" x1="870" y1="72" x2="900" y2="120"/><text class="dsl" x="906" y="124">S6 · 192.168.7.0/24 · PC-11 .13</text>
+    <!-- anillo EIGRP -->
+    <polyline class="lk eigrp" points="90,350 200,260 400,260 470,370 400,490 200,490 90,350"/>
+    <text class="lb eigrp" x="128" y="296">16.0/30</text>
+    <text class="lb eigrp" x="300" y="252" text-anchor="middle">21.0/30</text>
+    <text class="lb eigrp" x="446" y="306">22.0/30</text>
+    <text class="lb eigrp" x="446" y="440">19.0/30</text>
+    <text class="lb eigrp" x="300" y="508" text-anchor="middle">18.0/30</text>
+    <text class="lb eigrp" x="100" y="436">17.0/30</text>
+    <line class="lk lan" x1="200" y1="490" x2="200" y2="570"/><text class="dsl" x="210" y="582">S7 · LAN Medellín 192.168.50.0/24 · PC .10</text>
+    <!-- R6 - R1 -->
+    <line class="lk eigrp" x1="470" y1="370" x2="620" y2="300"/>
+    <text class="lb eigrp" x="545" y="322" text-anchor="middle">25.0/30</text>
+    <!-- RIP -->
+    <line class="lk rip" x1="620" y1="300" x2="840" y2="300"/>
+    <text class="lb rip" x="730" y="292" text-anchor="middle">20.20.20.0/30 · RIP</text>
+    <line class="lk wan" x1="840" y1="300" x2="1010" y2="300"/>
+    <text class="lb" x="925" y="292" text-anchor="middle">e0/3 · NAT</text>
+    <line class="lk lan" x1="620" y1="300" x2="620" y2="380"/><text class="dsl" x="560" y="400">S3 · 192.168.15.0/24</text><text class="dsl" x="560" y="414">ciscoip-1 .10</text>
+    <!-- troncales -->
+    <path class="lk tr" d="M830,322 L770,450"/>
+    <path class="lk tr" d="M850,322 L790,450"/>
+    <text class="lb tr" x="704" y="372">e0/1 · V10,20</text>
+    <text class="lb tr" x="822" y="388">e0/2 · V30,40,99</text>
+    <line class="lk tr" x1="780" y1="466" x2="960" y2="466"/>
+    <line class="lk tr" x1="780" y1="474" x2="960" y2="474"/>
+    <text class="lb tr" x="870" y="458" text-anchor="middle">Po1 · LACP</text>
+    <!-- hosts -->
+    <text class="dsl" x="600" y="520">SW1</text>
+    <text class="dsl" x="600" y="536"><tspan class="v10" fill="currentColor">V10</tspan> PC14 .12 · VPC .11 · VPC32 dhcp</text>
+    <text class="dsl" x="600" y="552"><tspan class="v20" fill="currentColor">V20</tspan> DNS1 .3 · VPC2 .11</text>
+    <text class="dsl" x="600" y="568"><tspan class="v30" fill="currentColor">V30</tspan> VPC10 .12 · PC13 .32</text>
+    <text class="dsl" x="600" y="584"><tspan class="v40" fill="currentColor">V40</tspan> VPC3 .10 (par)</text>
+    <text class="dsl" x="880" y="520">SW2</text>
+    <text class="dsl" x="880" y="536"><tspan class="v30" fill="currentColor">V30</tspan> WEB .2 · VPC11 .11</text>
+    <text class="dsl" x="880" y="552"><tspan class="v40" fill="currentColor">V40</tspan> VPC12 .11 (impar)</text>
+    <text class="dsl" x="880" y="568"><tspan class="v20" fill="currentColor">V20</tspan> VPC5 .10</text>
+    <text class="dsl" x="880" y="584"><tspan class="v10" fill="currentColor">V10</tspan> VPC4 .10 · DHCP .2</text>
+    <text class="dsl" x="880" y="600"><tspan class="v99" fill="currentColor">V99</tspan> SRV-MON .10</text>
+    <!-- nodos -->
+    <g>
+      <circle class="dn r" cx="90" cy="72" r="20"/><text class="dt" x="90" y="76">R9</text><text class="ds" x="90" y="106">Tunja</text>
+      <circle class="dn r" cx="480" cy="72" r="20"/><text class="dt" x="480" y="76">R10</text><text class="ds" x="480" y="106">Duitama</text>
+      <circle class="dn mk" cx="870" cy="72" r="20"/><text class="dt" x="870" y="76">R11</text><text class="ds" x="870" y="106">Sogamoso · MikroTik</text>
+      <circle class="dn r" cx="90" cy="350" r="20"/><text class="dt" x="90" y="354">R3</text><text class="ds" x="90" y="384">Paipa · ASBR</text>
+      <circle class="dn r" cx="200" cy="260" r="20"/><text class="dt" x="200" y="264">R4</text><text class="ds" x="200" y="236">Bucaramanga</text>
+      <circle class="dn r" cx="400" cy="260" r="20"/><text class="dt" x="400" y="264">R5</text><text class="ds" x="400" y="236">Barrancabermeja</text>
+      <circle class="dn r" cx="470" cy="370" r="20"/><text class="dt" x="470" y="374">R6</text><text class="ds" x="470" y="404">Cúcuta</text>
+      <circle class="dn r" cx="400" cy="490" r="20"/><text class="dt" x="400" y="494">R7</text><text class="ds" x="400" y="526">Bogotá</text>
+      <circle class="dn r" cx="200" cy="490" r="20"/><text class="dt" x="200" y="494">R8</text><text class="ds" x="250" y="478">Medellín</text>
+      <circle class="dn r" cx="620" cy="300" r="20"/><text class="dt" x="620" y="304">R1</text><text class="ds" x="620" y="270">Pamplona · ASBR</text>
+      <circle class="dn r" cx="840" cy="300" r="20"/><text class="dt" x="840" y="304">R2</text><text class="ds" x="840" y="270">Pamplona · borde</text>
+      <rect class="dn sw" x="740" y="452" width="56" height="34" rx="6"/><text class="dt" x="768" y="473">SW1</text>
+      <rect class="dn sw" x="944" y="452" width="56" height="34" rx="6"/><text class="dt" x="972" y="473">SW2</text>
+      <ellipse class="dn r" cx="1040" cy="300" rx="36" ry="22"/><text class="dt" x="1040" y="304">Cloud0</text><text class="ds" x="1040" y="338">Internet</text>
+    </g>
+  </svg>
+  </div>
+
+  <h3>Nodos a crear</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Nombre del nodo</th><th>Plantilla / imagen</th><th>Ajustes</th></tr></thead>
+    <tbody>
+      <tr><td>R1-PAMPLONA … R10-DUITAMA (10 routers)</td><td>Cisco IOL · imagen L3</td><td>Ethernet portgroups = 1 (4 puertos), RAM 512</td></tr>
+      <tr><td>R11-SOGAMOSO</td><td>MikroTik RouterOS (CHR)</td><td>2 interfaces, RAM 256</td></tr>
+      <tr><td>DNS1, WEB-SERVER, DHCP-SRV</td><td>Cisco IOL · imagen L3</td><td>portgroups = 1, RAM 384</td></tr>
+      <tr><td>SW1, SW2</td><td>Cisco IOL · imagen L2</td><td><b>Ethernet portgroups = 3</b> (12 puertos)</td></tr>
+      <tr><td>S3, S4, S5, S6, S7</td><td>Cisco IOL · imagen L2</td><td>portgroups = 1</td></tr>
+      <tr><td>PC14, VPC, VPC32, VPC2, VPC10, PC13, VPC3, VPC11, VPC12, VPC5, VPC4, CISCOIP-1, PC-9, PC-10, PC-11, PC-MEDELLIN</td><td>Virtual PC (VPCS)</td><td>—</td></tr>
+      <tr><td>SRV-MON</td><td>Linux · Ubuntu Server</td><td>CPU 2–4, RAM 4096 (o más), 1 interfaz</td></tr>
+      <tr><td>Internet</td><td>Network → <b>Management(Cloud0)</b></td><td>—</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Cableado</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Desde</th><th>Puerto</th><th>Hasta</th><th>Puerto</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td>R2-PAMPLONA</td><td class="m">e0/0</td><td>R1-PAMPLONA</td><td class="m">e0/0</td><td><span class="tag t-rip">RIP</span> 20.20.20.0/30</td></tr>
+      <tr><td>R2-PAMPLONA</td><td class="m">e0/1</td><td>SW1</td><td class="m">e0/0</td><td>Troncal VLAN 10, 20</td></tr>
+      <tr><td>R2-PAMPLONA</td><td class="m">e0/2</td><td>SW1</td><td class="m">e0/1</td><td>Troncal VLAN 30, 40, 99</td></tr>
+      <tr><td>R2-PAMPLONA</td><td class="m">e0/3</td><td>Cloud0</td><td class="m">—</td><td>Internet (DHCP)</td></tr>
+      <tr><td>SW1</td><td class="m">e0/2</td><td>SW2</td><td class="m">e0/0</td><td>EtherChannel Po1</td></tr>
+      <tr><td>SW1</td><td class="m">e0/3</td><td>SW2</td><td class="m">e0/1</td><td>EtherChannel Po1</td></tr>
+      <tr><td>SW1</td><td class="m">e1/0</td><td>PC14</td><td class="m">e0</td><td><span class="v10">VLAN 10</span></td></tr>
+      <tr><td>SW1</td><td class="m">e1/1</td><td>VPC</td><td class="m">e0</td><td><span class="v10">VLAN 10</span></td></tr>
+      <tr><td>SW1</td><td class="m">e1/2</td><td>VPC32</td><td class="m">e0</td><td><span class="v10">VLAN 10</span> (DHCP)</td></tr>
+      <tr><td>SW1</td><td class="m">e1/3</td><td>DNS1</td><td class="m">e0/0</td><td><span class="v20">VLAN 20</span></td></tr>
+      <tr><td>SW1</td><td class="m">e2/0</td><td>VPC2</td><td class="m">e0</td><td><span class="v20">VLAN 20</span></td></tr>
+      <tr><td>SW1</td><td class="m">e2/1</td><td>VPC10</td><td class="m">e0</td><td><span class="v30">VLAN 30</span></td></tr>
+      <tr><td>SW1</td><td class="m">e2/2</td><td>PC13</td><td class="m">e0</td><td><span class="v30">VLAN 30</span></td></tr>
+      <tr><td>SW1</td><td class="m">e2/3</td><td>VPC3</td><td class="m">e0</td><td><span class="v40">VLAN 40</span></td></tr>
+      <tr><td>SW2</td><td class="m">e0/2</td><td>WEB-SERVER</td><td class="m">e0/0</td><td><span class="v30">VLAN 30</span></td></tr>
+      <tr><td>SW2</td><td class="m">e0/3</td><td>VPC11</td><td class="m">e0</td><td><span class="v30">VLAN 30</span></td></tr>
+      <tr><td>SW2</td><td class="m">e1/0</td><td>VPC12</td><td class="m">e0</td><td><span class="v40">VLAN 40</span></td></tr>
+      <tr><td>SW2</td><td class="m">e1/1</td><td>VPC5</td><td class="m">e0</td><td><span class="v20">VLAN 20</span></td></tr>
+      <tr><td>SW2</td><td class="m">e1/2</td><td>VPC4</td><td class="m">e0</td><td><span class="v10">VLAN 10</span></td></tr>
+      <tr><td>SW2</td><td class="m">e1/3</td><td>DHCP-SRV</td><td class="m">e0/0</td><td><span class="v10">VLAN 10</span></td></tr>
+      <tr><td>SW2</td><td class="m">e2/0</td><td>SRV-MON</td><td class="m">e0</td><td><span class="v99">VLAN 99</span> gestión</td></tr>
+      <tr><td>R1-PAMPLONA</td><td class="m">e0/1</td><td>R6-CUCUTA</td><td class="m">e0/2</td><td><span class="tag t-eigrp">EIGRP</span> 192.168.25.0/30</td></tr>
+      <tr><td>R1-PAMPLONA</td><td class="m">e0/2</td><td>S3</td><td class="m">e0/0</td><td>LAN 192.168.15.0/24</td></tr>
+      <tr><td>S3</td><td class="m">e0/1</td><td>CISCOIP-1</td><td class="m">e0</td><td>PC de la LAN Pamplona</td></tr>
+      <tr><td>R3-PAIPA</td><td class="m">e0/0</td><td>R4-BUCARAMANGA</td><td class="m">e0/0</td><td><span class="tag t-eigrp">EIGRP</span> 192.168.16.0/30</td></tr>
+      <tr><td>R3-PAIPA</td><td class="m">e0/1</td><td>R8-MEDELLIN</td><td class="m">e0/0</td><td><span class="tag t-eigrp">EIGRP</span> 192.168.17.0/30</td></tr>
+      <tr><td>R3-PAIPA</td><td class="m">e0/2</td><td>R9-TUNJA</td><td class="m">e0/0</td><td><span class="tag t-ospf">OSPF</span> 192.168.24.0/30</td></tr>
+      <tr><td>R4-BUCARAMANGA</td><td class="m">e0/1</td><td>R5-BARRANCABERMEJA</td><td class="m">e0/0</td><td><span class="tag t-eigrp">EIGRP</span> 192.168.21.0/30</td></tr>
+      <tr><td>R5-BARRANCABERMEJA</td><td class="m">e0/1</td><td>R6-CUCUTA</td><td class="m">e0/0</td><td><span class="tag t-eigrp">EIGRP</span> 192.168.22.0/30</td></tr>
+      <tr><td>R6-CUCUTA</td><td class="m">e0/1</td><td>R7-BOGOTA</td><td class="m">e0/0</td><td><span class="tag t-eigrp">EIGRP</span> 192.168.19.0/30</td></tr>
+      <tr><td>R7-BOGOTA</td><td class="m">e0/1</td><td>R8-MEDELLIN</td><td class="m">e0/1</td><td><span class="tag t-eigrp">EIGRP</span> 192.168.18.0/30</td></tr>
+      <tr><td>R8-MEDELLIN</td><td class="m">e0/2</td><td>S7</td><td class="m">e0/0</td><td>LAN 192.168.50.0/24</td></tr>
+      <tr><td>S7</td><td class="m">e0/1</td><td>PC-MEDELLIN</td><td class="m">e0</td><td>PC LAN Medellín</td></tr>
+      <tr><td>R9-TUNJA</td><td class="m">e0/1</td><td>R10-DUITAMA</td><td class="m">e0/0</td><td><span class="tag t-ospf">OSPF</span> 10.0.0.0/30</td></tr>
+      <tr><td>R9-TUNJA</td><td class="m">e0/2</td><td>S4</td><td class="m">e0/0</td><td>LAN 192.168.5.0/24</td></tr>
+      <tr><td>S4</td><td class="m">e0/1</td><td>PC-9</td><td class="m">e0</td><td>PC Tunja</td></tr>
+      <tr><td>R10-DUITAMA</td><td class="m">e0/1</td><td>R11-SOGAMOSO</td><td class="m">e0 (ether1)</td><td><span class="tag t-ospf">OSPF</span> 10.0.0.4/30 área 1</td></tr>
+      <tr><td>R10-DUITAMA</td><td class="m">e0/2</td><td>S5</td><td class="m">e0/0</td><td>LAN 192.168.6.0/24</td></tr>
+      <tr><td>S5</td><td class="m">e0/1</td><td>PC-10</td><td class="m">e0</td><td>PC Duitama</td></tr>
+      <tr><td>R11-SOGAMOSO</td><td class="m">e1 (ether2)</td><td>S6</td><td class="m">e0/0</td><td>LAN 192.168.7.0/24</td></tr>
+      <tr><td>S6</td><td class="m">e0/1</td><td>PC-11</td><td class="m">e0</td><td>PC Sogamoso</td></tr>
+    </tbody>
+  </table></div>
+  <p class="lead">Cuando todo esté cableado: <b>More actions → Start all nodes</b>. Toma la captura de la topología completa (evidencia 1) y guarda el lab.</p>
+</section>
+
+<!-- ================= 03 IPS ================= -->
+<section id="ips">
+  <div class="sec-head"><span class="eyebrow">03 · Direccionamiento</span><h2>Tabla de direccionamiento IP</h2></div>
+  <p class="lead">Esta tabla va tal cual al informe (evidencia 2). Respeta las IP del diagrama del profesor y agrega las que el diagrama no indicaba.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Zona</th><th>Dispositivo</th><th>Interfaz</th><th>IP / máscara</th><th>Descripción</th></tr></thead>
+    <tbody>
+      <tr><td><span class="tag t-rip">RIP</span></td><td>R1-PAMPLONA</td><td class="m">e0/0</td><td class="m">20.20.20.1/30</td><td>Enlace R1–R2</td></tr>
+      <tr><td><span class="tag t-eigrp">EIGRP</span></td><td>R1-PAMPLONA</td><td class="m">e0/1</td><td class="m">192.168.25.2/30</td><td>Enlace R1–R6</td></tr>
+      <tr><td><span class="tag t-rip">RIP</span></td><td>R1-PAMPLONA</td><td class="m">e0/2</td><td class="m">192.168.15.1/24</td><td>LAN Pamplona (S3)</td></tr>
+      <tr><td><span class="tag t-rip">RIP</span></td><td>R2-PAMPLONA</td><td class="m">e0/0</td><td class="m">20.20.20.2/30</td><td>Enlace R2–R1</td></tr>
+      <tr><td><span class="tag t-vlan">VLAN</span></td><td>R2-PAMPLONA</td><td class="m">e0/1.10</td><td class="m">192.168.10.1/24</td><td>Gateway VLAN 10 usuarios</td></tr>
+      <tr><td><span class="tag t-vlan">VLAN</span></td><td>R2-PAMPLONA</td><td class="m">e0/1.20</td><td class="m">192.168.20.1/24</td><td>Gateway VLAN 20 DNS</td></tr>
+      <tr><td><span class="tag t-vlan">VLAN</span></td><td>R2-PAMPLONA</td><td class="m">e0/2.30</td><td class="m">192.168.30.1/24</td><td>Gateway VLAN 30 web</td></tr>
+      <tr><td><span class="tag t-vlan">VLAN</span></td><td>R2-PAMPLONA</td><td class="m">e0/2.40</td><td class="m">192.168.40.1/24</td><td>Gateway VLAN 40 administración</td></tr>
+      <tr><td><span class="tag t-mon">Gestión</span></td><td>R2-PAMPLONA</td><td class="m">e0/2.99</td><td class="m">192.168.99.1/24</td><td>Gateway VLAN 99 gestión</td></tr>
+      <tr><td><span class="tag t-net">Internet</span></td><td>R2-PAMPLONA</td><td class="m">e0/3</td><td class="m">DHCP (<span class="phi" data-k="WAN"></span>)</td><td>Salida a Internet / NAT outside</td></tr>
+      <tr><td><span class="tag t-eigrp">EIGRP</span></td><td>R3-PAIPA</td><td class="m">e0/0 · e0/1 · Lo0</td><td class="m">192.168.16.1/30 · 192.168.17.1/30 · 172.16.3.1/24</td><td>A R4 · a R8 · LAN simulada</td></tr>
+      <tr><td><span class="tag t-ospf">OSPF</span></td><td>R3-PAIPA</td><td class="m">e0/2</td><td class="m">192.168.24.2/30</td><td>Enlace R3–R9 área 0</td></tr>
+      <tr><td><span class="tag t-eigrp">EIGRP</span></td><td>R4-BUCARAMANGA</td><td class="m">e0/0 · e0/1 · Lo0</td><td class="m">192.168.16.2/30 · 192.168.21.2/30 · 172.16.4.1/24</td><td>A R3 · a R5 · LAN sede</td></tr>
+      <tr><td><span class="tag t-eigrp">EIGRP</span></td><td>R5-BARRANCABERMEJA</td><td class="m">e0/0 · e0/1 · Lo0</td><td class="m">192.168.21.1/30 · 192.168.22.1/30 · 172.16.5.1/24</td><td>A R4 · a R6 · LAN sede</td></tr>
+      <tr><td><span class="tag t-eigrp">EIGRP</span></td><td>R6-CUCUTA</td><td class="m">e0/0 · e0/1 · e0/2 · Lo0</td><td class="m">192.168.22.2/30 · 192.168.19.2/30 · 192.168.25.1/30 · 172.16.6.1/24</td><td>A R5 · a R7 · a R1 · LAN sede</td></tr>
+      <tr><td><span class="tag t-eigrp">EIGRP</span></td><td>R7-BOGOTA</td><td class="m">e0/0 · e0/1 · Lo0</td><td class="m">192.168.19.1/30 · 192.168.18.1/30 · 172.16.7.1/24</td><td>A R6 · a R8 · LAN sede</td></tr>
+      <tr><td><span class="tag t-eigrp">EIGRP</span></td><td>R8-MEDELLIN</td><td class="m">e0/0 · e0/1 · e0/2</td><td class="m">192.168.17.2/30 · 192.168.18.2/30 · 192.168.50.1/24</td><td>A R3 · a R7 · LAN Medellín</td></tr>
+      <tr><td><span class="tag t-ospf">OSPF</span></td><td>R9-TUNJA</td><td class="m">e0/0 · e0/1 · e0/2</td><td class="m">192.168.24.1/30 · 10.0.0.1/30 · 192.168.5.1/24</td><td>A R3 · a R10 · LAN Tunja</td></tr>
+      <tr><td><span class="tag t-ospf">OSPF</span></td><td>R10-DUITAMA</td><td class="m">e0/0 · e0/1 · e0/2</td><td class="m">10.0.0.2/30 · 10.0.0.5/30 · 192.168.6.1/24</td><td>A R9 (área 0) · a R11 (área 1) · LAN</td></tr>
+      <tr><td><span class="tag t-ospf">OSPF</span></td><td>R11-SOGAMOSO</td><td class="m">ether1 · ether2</td><td class="m">10.0.0.6/30 · 192.168.7.1/24</td><td>A R10 · LAN Sogamoso (área 1)</td></tr>
+      <tr><td><span class="tag t-vlan">VLAN</span></td><td>SW1 · SW2</td><td class="m">Vlan40</td><td class="m">192.168.40.2/24 · 192.168.40.3/24</td><td>Gestión de switches (Telnet)</td></tr>
+      <tr><td><span class="tag t-srv">Servidor</span></td><td>DHCP-SRV</td><td class="m">e0/0</td><td class="m">192.168.10.2/24</td><td>DHCP para VLAN 10/20/30/40</td></tr>
+      <tr><td><span class="tag t-srv">Servidor</span></td><td>DNS1</td><td class="m">e0/0</td><td class="m">192.168.20.3/24</td><td>DNS www.redes2.local</td></tr>
+      <tr><td><span class="tag t-srv">Servidor</span></td><td>WEB-SERVER</td><td class="m">e0/0</td><td class="m">192.168.30.2/24</td><td>Servidor web HTTP</td></tr>
+      <tr><td><span class="tag t-mon">Gestión</span></td><td>SRV-MON (Zabbix, Grafana, n8n)</td><td class="m">eth0</td><td class="m">192.168.99.10/24</td><td>Monitoreo y automatización</td></tr>
+      <tr><td>PCs</td><td>VLAN 10: PC14 · VPC · VPC4 · VPC32</td><td class="m">e0</td><td class="m">.10.12 · .10.11 · .10.10 · DHCP</td><td>Gateway 192.168.10.1</td></tr>
+      <tr><td>PCs</td><td>VLAN 20: VPC2 · VPC5</td><td class="m">e0</td><td class="m">.20.11 · .20.10</td><td>Gateway 192.168.20.1</td></tr>
+      <tr><td>PCs</td><td>VLAN 30: VPC10 · PC13 · VPC11</td><td class="m">e0</td><td class="m">.30.12 · .30.32 · .30.11</td><td>Gateway 192.168.30.1</td></tr>
+      <tr><td>PCs</td><td>VLAN 40: VPC3 (par) · VPC12 (impar)</td><td class="m">e0</td><td class="m">.40.10 · .40.11</td><td>Gateway 192.168.40.1</td></tr>
+      <tr><td>PCs</td><td>CISCOIP-1 · PC-9 · PC-10 · PC-11 · PC-MEDELLIN</td><td class="m">e0</td><td class="m">192.168.15.10 · 5.11 · 6.12 · 7.13 · 50.10</td><td>Gateway = .1 de su LAN</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Credenciales del laboratorio</th><th>Usuario</th><th>Clave</th></tr></thead>
+    <tbody>
+      <tr><td>Routers Cisco (SSH) y switches (Telnet)</td><td class="m">admin</td><td class="m">Admin2026*</td></tr>
+      <tr><td>enable secret (todos los Cisco)</td><td class="m">—</td><td class="m">Redes2*</td></tr>
+      <tr><td>SNMP v2c (solo desde 192.168.99.10)</td><td class="m">comunidad</td><td class="m">redes2</td></tr>
+      <tr><td>Zabbix web · Grafana web</td><td class="m">Admin · admin</td><td class="m">zabbix · admin</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ================= 04 BORDE ================= -->
+<section id="borde">
+  <div class="sec-head"><span class="eyebrow">04 · Borde, switches y servidores</span><h2>R2, SW1, SW2, DNS1, WEB y DHCP</h2></div>
+  <p class="lead">Empieza aquí: con R2 + SW1 + SW2 el servidor de monitoreo ya tiene Internet y puede instalar mientras configuras lo demás.</p>
+
+  <div class="devs">
+  <article class="dev" data-dev="r2">
+    <div class="dev-h"><div class="id"><h3>R2-PAMPLONA</h3><span class="tag t-rip">RIP</span><span class="tag t-vlan">Router-on-a-stick</span><span class="tag t-net">NAT · borde</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-r2">Configurado</label></div>
+    <div class="dev-b">
+      <div class="ifs"><span>e0/0 <b>20.20.20.2/30</b></span><span>e0/1.10 <b>.10.1</b> · .20 <b>.20.1</b></span><span>e0/2.30 <b>.30.1</b> · .40 <b>.40.1</b> · .99 <b>.99.1</b></span><span>e0/3 <b>DHCP → Cloud0</b></span></div>
+      <p>Incluye: subinterfaces 802.1Q, relay DHCP, RIP v2 con ruta por defecto, NAT con sobrecarga, port-forward hacia el servidor de monitoreo, ACL de las políticas de acceso, SSH solo VLAN 40 y SNMP.</p>
+      <div class="code"><div class="cap"><span>Bloque 1 de 2 · configuración completa</span></div><pre><code>enable
+configure terminal
+hostname R2-PAMPLONA
+no ip domain-lookup
+ip domain-name redes2.local
+service password-encryption
+enable secret Redes2*
+username admin privilege 15 secret Admin2026*
+banner motd #R2-PAMPLONA - Acceso solo desde VLAN 40#
+!
+! ===== ACL de politicas de acceso (requisitos 3, 4 y 5) =====
+ip access-list extended VLAN10_IN
+ remark R5 - VLAN10 hace ping a VLAN20 y VLAN30 pero NUNCA a VLAN40
+ permit udp host 192.168.10.2 eq bootps any
+ deny   ip 192.168.10.0 0.0.0.255 192.168.40.0 0.0.0.255
+ permit ip any any
+ip access-list extended VLAN40_IN
+ remark VLAN40 tampoco llega a VLAN10
+ deny   ip 192.168.40.0 0.0.0.255 192.168.10.0 0.0.0.255
+ remark R4 - IP IMPAR de VLAN40 puede usar el DNS
+ permit udp 192.168.40.1 0.0.0.254 host 192.168.20.3 eq domain
+ permit tcp 192.168.40.1 0.0.0.254 host 192.168.20.3 eq domain
+ remark R3 - IP PAR de VLAN40 sin DNS (nada hacia VLAN20)
+ deny   ip 192.168.40.0 0.0.0.255 192.168.20.0 0.0.0.255
+ remark R3 R4 - toda la VLAN40 entra al web por HTTP
+ permit tcp 192.168.40.0 0.0.0.255 host 192.168.30.2 eq www
+ remark Limita trafico innecesario hacia el servidor web y VLAN30
+ deny   ip 192.168.40.0 0.0.0.255 192.168.30.0 0.0.0.255
+ permit ip any any
+exit
+!
+! ===== Interfaces =====
+interface Ethernet0/0
+ description WAN-R1-RIP
+ ip address 20.20.20.2 255.255.255.252
+ ip nat inside
+ no shutdown
+interface Ethernet0/1
+ description TRONCAL-SW1-VLAN10-20
+ no ip address
+ no shutdown
+interface Ethernet0/1.10
+ description VLAN10-USUARIOS
+ encapsulation dot1Q 10
+ ip address 192.168.10.1 255.255.255.0
+ ip nat inside
+ ip access-group VLAN10_IN in
+interface Ethernet0/1.20
+ description VLAN20-DNS
+ encapsulation dot1Q 20
+ ip address 192.168.20.1 255.255.255.0
+ ip helper-address 192.168.10.2
+ ip nat inside
+interface Ethernet0/2
+ description TRONCAL-SW1-VLAN30-40-99
+ no ip address
+ no shutdown
+interface Ethernet0/2.30
+ description VLAN30-WEB
+ encapsulation dot1Q 30
+ ip address 192.168.30.1 255.255.255.0
+ ip helper-address 192.168.10.2
+ ip nat inside
+interface Ethernet0/2.40
+ description VLAN40-ADMIN
+ encapsulation dot1Q 40
+ ip address 192.168.40.1 255.255.255.0
+ ip helper-address 192.168.10.2
+ ip nat inside
+ ip access-group VLAN40_IN in
+interface Ethernet0/2.99
+ description VLAN99-GESTION-MONITOREO
+ encapsulation dot1Q 99
+ ip address 192.168.99.1 255.255.255.0
+ ip nat inside
+interface Ethernet0/3
+ description INTERNET-CLOUD0
+ ip address dhcp
+ ip nat outside
+ no shutdown
+exit
+!
+! ===== RIP v2 + anuncio controlado de la ruta por defecto =====
+router rip
+ version 2
+ no auto-summary
+ network 20.0.0.0
+ network 192.168.10.0
+ network 192.168.20.0
+ network 192.168.30.0
+ network 192.168.40.0
+ network 192.168.99.0
+ passive-interface default
+ no passive-interface Ethernet0/0
+ default-information originate
+exit
+!
+! ===== NAT con sobrecarga (PAT) =====
+access-list 1 remark REDES-INTERNAS-PARA-NAT
+access-list 1 permit 192.168.0.0 0.0.255.255
+access-list 1 permit 172.16.0.0 0.0.255.255
+access-list 1 permit 10.0.0.0 0.255.255.255
+access-list 1 permit 20.20.20.0 0.0.0.3
+ip nat inside source list 1 interface Ethernet0/3 overload
+!
+! ===== NAT estatico (port-forward) para abrir el monitoreo desde Windows =====
+ip nat inside source static tcp 192.168.99.10 80 interface Ethernet0/3 8080
+ip nat inside source static tcp 192.168.99.10 3000 interface Ethernet0/3 3000
+ip nat inside source static tcp 192.168.99.10 5678 interface Ethernet0/3 5678
+ip nat inside source static tcp 192.168.99.10 22 interface Ethernet0/3 2222
+!
+! ===== SSH solo desde VLAN 40 (requisito 1) =====
+access-list 10 remark SOLO-VLAN40-ADMIN
+access-list 10 permit 192.168.40.0 0.0.0.255
+line con 0
+ logging synchronous
+ exec-timeout 0 0
+line vty 0 4
+ access-class 10 in
+ login local
+ transport input ssh
+exit
+!
+! ===== SNMP para Zabbix =====
+access-list 20 remark SOLO-ZABBIX
+access-list 20 permit host 192.168.99.10
+snmp-server community redes2 RO 20
+snmp-server location Pamplona-Borde
+!
+crypto key generate rsa modulus 1024
+ip ssh version 2
+end
+write memory</code></pre></div>
+      <p>Espera 20–30 s y revisa que e0/3 tenga IP y cuál es el gateway:</p>
+      <div class="code"><div class="cap"><span>R2 · verificación</span></div><pre><code>show ip interface brief | include Ethernet0/3
+show dhcp lease</code></pre></div>
+      <p>Copia la IP de e0/3 en <b>“IP WAN de R2”</b> y el <i>Default router</i> en <b>“Gateway de Internet”</b> (arriba). Luego pega el bloque 2:</p>
+      <div class="code"><div class="cap"><span>Bloque 2 de 2 · ruta estática por defecto</span></div><pre><code>configure terminal
+ip route 0.0.0.0 0.0.0.0 %%GW%% name RUTA-ESTATICA-INTERNET
+end
+write memory
+ping 8.8.8.8</code></pre></div>
+    </div>
+  </article>
+
+  <article class="dev" data-dev="sw1">
+    <div class="dev-h"><div class="id"><h3>SW1</h3><span class="tag t-vlan">VLAN</span><span class="tag t-vlan">EtherChannel</span><span class="img">Switch1 · IOL L2 · 3 portgroups</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-sw1">Configurado</label></div>
+    <div class="dev-b">
+      <div class="ifs"><span>e0/0 <b>troncal 10,20</b></span><span>e0/1 <b>troncal 30,40,99</b></span><span>e0/2–3 <b>Po1 LACP</b></span><span>Vlan40 <b>192.168.40.2</b></span></div>
+      <div class="code"><div class="cap"><span>SW1 · configuración completa</span></div><pre><code>enable
+configure terminal
+hostname SW1
+no ip domain-lookup
+service password-encryption
+enable secret Redes2*
+username admin privilege 15 secret Admin2026*
+banner motd #SW1 - Acceso por Telnet solo desde VLAN 40#
+vtp mode transparent
+vlan 10
+ name USUARIOS
+vlan 20
+ name DNS
+vlan 30
+ name WEB
+vlan 40
+ name ADMINISTRACION
+vlan 99
+ name GESTION
+exit
+port-channel load-balance src-dst-ip
+!
+interface Ethernet0/0
+ description TRONCAL-R2-e0/1-VLAN10-20
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20
+ no shutdown
+interface Ethernet0/1
+ description TRONCAL-R2-e0/2-VLAN30-40-99
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 30,40,99
+ no shutdown
+!
+! ===== EtherChannel LACP hacia SW2 =====
+interface range Ethernet0/2 - 3
+ description ETHERCHANNEL-A-SW2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,40,99
+ channel-group 1 mode active
+ no shutdown
+interface Port-channel1
+ description PO1-LACP-SW2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,40,99
+!
+! ===== Puertos de acceso =====
+interface range Ethernet1/0 - 2
+ description VLAN10-PC14-VPC-VPC32
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+ no shutdown
+interface range Ethernet1/3 , Ethernet2/0
+ description VLAN20-DNS1-VPC2
+ switchport mode access
+ switchport access vlan 20
+ spanning-tree portfast
+ no shutdown
+interface range Ethernet2/1 - 2
+ description VLAN30-VPC10-PC13
+ switchport mode access
+ switchport access vlan 30
+ spanning-tree portfast
+ no shutdown
+interface Ethernet2/3
+ description VLAN40-VPC3
+ switchport mode access
+ switchport access vlan 40
+ spanning-tree portfast
+ no shutdown
+!
+! ===== Gestion y Telnet solo VLAN 40 (requisito 2) =====
+interface Vlan40
+ description GESTION-SW1
+ ip address 192.168.40.2 255.255.255.0
+ no shutdown
+exit
+ip default-gateway 192.168.40.1
+access-list 10 remark SOLO-VLAN40-ADMIN
+access-list 10 permit 192.168.40.0 0.0.0.255
+line con 0
+ logging synchronous
+ exec-timeout 0 0
+line vty 0 4
+ access-class 10 in
+ login local
+ transport input telnet
+exit
+access-list 20 permit host 192.168.99.10
+snmp-server community redes2 RO 20
+snmp-server location Pamplona-Switch1
+end
+write memory</code></pre></div>
+    </div>
+  </article>
+
+  <article class="dev" data-dev="sw2">
+    <div class="dev-h"><div class="id"><h3>SW2</h3><span class="tag t-vlan">VLAN</span><span class="tag t-vlan">EtherChannel</span><span class="img">Switch2 · IOL L2 · 3 portgroups</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-sw2">Configurado</label></div>
+    <div class="dev-b">
+      <div class="ifs"><span>e0/0–1 <b>Po1 LACP</b></span><span>Vlan40 <b>192.168.40.3</b></span><span>e2/0 <b>SRV-MON (V99)</b></span></div>
+      <div class="code"><div class="cap"><span>SW2 · configuración completa</span></div><pre><code>enable
+configure terminal
+hostname SW2
+no ip domain-lookup
+service password-encryption
+enable secret Redes2*
+username admin privilege 15 secret Admin2026*
+banner motd #SW2 - Acceso por Telnet solo desde VLAN 40#
+vtp mode transparent
+vlan 10
+ name USUARIOS
+vlan 20
+ name DNS
+vlan 30
+ name WEB
+vlan 40
+ name ADMINISTRACION
+vlan 99
+ name GESTION
+exit
+port-channel load-balance src-dst-ip
+!
+! ===== EtherChannel LACP hacia SW1 =====
+interface range Ethernet0/0 - 1
+ description ETHERCHANNEL-A-SW1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,40,99
+ channel-group 1 mode active
+ no shutdown
+interface Port-channel1
+ description PO1-LACP-SW1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,40,99
+!
+! ===== Puertos de acceso =====
+interface range Ethernet0/2 - 3
+ description VLAN30-WEB-SERVER-VPC11
+ switchport mode access
+ switchport access vlan 30
+ spanning-tree portfast
+ no shutdown
+interface Ethernet1/0
+ description VLAN40-VPC12
+ switchport mode access
+ switchport access vlan 40
+ spanning-tree portfast
+ no shutdown
+interface Ethernet1/1
+ description VLAN20-VPC5
+ switchport mode access
+ switchport access vlan 20
+ spanning-tree portfast
+ no shutdown
+interface range Ethernet1/2 - 3
+ description VLAN10-VPC4-DHCP
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+ no shutdown
+interface Ethernet2/0
+ description VLAN99-SRV-MON
+ switchport mode access
+ switchport access vlan 99
+ spanning-tree portfast
+ no shutdown
+!
+! ===== Gestion y Telnet solo VLAN 40 (requisito 2) =====
+interface Vlan40
+ description GESTION-SW2
+ ip address 192.168.40.3 255.255.255.0
+ no shutdown
+exit
+ip default-gateway 192.168.40.1
+access-list 10 remark SOLO-VLAN40-ADMIN
+access-list 10 permit 192.168.40.0 0.0.0.255
+line con 0
+ logging synchronous
+ exec-timeout 0 0
+line vty 0 4
+ access-class 10 in
+ login local
+ transport input telnet
+exit
+access-list 20 permit host 192.168.99.10
+snmp-server community redes2 RO 20
+snmp-server location Pamplona-Switch2
+end
+write memory</code></pre></div>
+      <p>Comprueba el EtherChannel: <code>show etherchannel summary</code> debe mostrar <code>Po1(SU)</code> con <code>Et0/0(P) Et0/1(P)</code>.</p>
+    </div>
+  </article>
+
+  <div class="mini">
+  <article class="dev" data-dev="dns">
+    <div class="dev-h"><div class="id"><h3>DNS1</h3><span class="tag t-srv">VLAN 20</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-dns">Configurado</label></div>
+    <div class="dev-b">
+      <div class="ifs"><span>e0/0 <b>192.168.20.3/24</b></span></div>
+      <div class="code"><div class="cap"><span>DNS1 · completa</span></div><pre><code>enable
+configure terminal
+hostname DNS1
+enable secret Redes2*
+interface Ethernet0/0
+ description VLAN20-SW1
+ ip address 192.168.20.3 255.255.255.0
+ no shutdown
+exit
+ip route 0.0.0.0 0.0.0.0 192.168.20.1
+ip domain-lookup
+ip domain-name redes2.local
+ip name-server 8.8.8.8
+ip dns server
+ip host www.redes2.local 192.168.30.2
+ip host web.redes2.local 192.168.30.2
+ip host dns1.redes2.local 192.168.20.3
+ip host zabbix.redes2.local 192.168.99.10
+access-list 20 permit host 192.168.99.10
+snmp-server community redes2 RO 20
+line con 0
+ logging synchronous
+ exec-timeout 0 0
+end
+write memory</code></pre></div>
+    </div>
+  </article>
+
+  <article class="dev" data-dev="web">
+    <div class="dev-h"><div class="id"><h3>WEB-SERVER</h3><span class="tag t-srv">VLAN 30</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-web">Configurado</label></div>
+    <div class="dev-b">
+      <div class="ifs"><span>e0/0 <b>192.168.30.2/24</b></span></div>
+      <div class="code"><div class="cap"><span>WEB-SERVER · completa</span></div><pre><code>enable
+configure terminal
+hostname WEB-SERVER
+no ip domain-lookup
+enable secret Redes2*
+username web privilege 15 secret Web2026*
+interface Ethernet0/0
+ description VLAN30-SW2
+ ip address 192.168.30.2 255.255.255.0
+ no shutdown
+exit
+ip route 0.0.0.0 0.0.0.0 192.168.30.1
+ip http server
+ip http authentication local
+no ip http secure-server
+access-list 20 permit host 192.168.99.10
+snmp-server community redes2 RO 20
+line con 0
+ logging synchronous
+ exec-timeout 0 0
+end
+write memory</code></pre></div>
+    </div>
+  </article>
+
+  <article class="dev" data-dev="dhcp">
+    <div class="dev-h"><div class="id"><h3>DHCP-SRV</h3><span class="tag t-srv">VLAN 10</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-dhcp">Configurado</label></div>
+    <div class="dev-b">
+      <div class="ifs"><span>e0/0 <b>192.168.10.2/24</b></span></div>
+      <div class="code"><div class="cap"><span>DHCP-SRV · completa</span></div><pre><code>enable
+configure terminal
+hostname DHCP-SRV
+no ip domain-lookup
+enable secret Redes2*
+interface Ethernet0/0
+ description VLAN10-SW2
+ ip address 192.168.10.2 255.255.255.0
+ no shutdown
+exit
+ip route 0.0.0.0 0.0.0.0 192.168.10.1
+ip dhcp excluded-address 192.168.10.1 192.168.10.50
+ip dhcp excluded-address 192.168.20.1 192.168.20.50
+ip dhcp excluded-address 192.168.30.1 192.168.30.50
+ip dhcp excluded-address 192.168.40.1 192.168.40.50
+ip dhcp pool VLAN10
+ network 192.168.10.0 255.255.255.0
+ default-router 192.168.10.1
+ dns-server 192.168.20.3
+ domain-name redes2.local
+ip dhcp pool VLAN20
+ network 192.168.20.0 255.255.255.0
+ default-router 192.168.20.1
+ dns-server 192.168.20.3
+ip dhcp pool VLAN30
+ network 192.168.30.0 255.255.255.0
+ default-router 192.168.30.1
+ dns-server 192.168.20.3
+ip dhcp pool VLAN40
+ network 192.168.40.0 255.255.255.0
+ default-router 192.168.40.1
+ dns-server 192.168.20.3
+exit
+access-list 20 permit host 192.168.99.10
+snmp-server community redes2 RO 20
+line con 0
+ logging synchronous
+ exec-timeout 0 0
+end
+write memory</code></pre></div>
+    </div>
+  </article>
+  </div>
+  </div>
+</section>
+
+<!-- ================= 05 RIP ================= -->
+<section id="rip">
+  <div class="sec-head"><span class="eyebrow">05 · Dominio RIP</span><h2>R1-Pamplona y la LAN de S3</h2></div>
+  <p class="lead">R1 habla RIP hacia R2 y EIGRP hacia R6. El bloque 2 es la redistribución: si quieres capturar primero cada dominio funcionando por separado (Fase 2 del PDF), toma las capturas de <code>show ip route</code> antes de pegarlo.</p>
+  <div class="devs">
+  <article class="dev" data-dev="r1">
+    <div class="dev-h"><div class="id"><h3>R1-PAMPLONA</h3><span class="tag t-rip">RIP</span><span class="tag t-eigrp">EIGRP</span><span class="img">ASBR RIP ↔ EIGRP</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-r1">Configurado</label></div>
+    <div class="dev-b">
+      <div class="ifs"><span>e0/0 <b>20.20.20.1/30</b></span><span>e0/1 <b>192.168.25.2/30</b></span><span>e0/2 <b>192.168.15.1/24</b></span></div>
+      <div class="code"><div class="cap"><span>Bloque 1 de 2 · configuración completa</span></div><pre><code>enable
+configure terminal
+hostname R1-PAMPLONA
+no ip domain-lookup
+ip domain-name redes2.local
+service password-encryption
+enable secret Redes2*
+username admin privilege 15 secret Admin2026*
+banner motd #R1-PAMPLONA - Acceso solo desde VLAN 40#
+!
+interface Ethernet0/0
+ description WAN-R2-RIP
+ ip address 20.20.20.1 255.255.255.252
+ no shutdown
+interface Ethernet0/1
+ description WAN-R6-CUCUTA-EIGRP
+ ip address 192.168.25.2 255.255.255.252
+ no shutdown
+interface Ethernet0/2
+ description LAN-PAMPLONA-S3
+ ip address 192.168.15.1 255.255.255.0
+ no shutdown
+exit
+!
+router rip
+ version 2
+ no auto-summary
+ network 20.0.0.0
+ network 192.168.15.0
+ passive-interface Ethernet0/2
+exit
+router eigrp 100
+ eigrp router-id 1.1.1.1
+ network 192.168.25.0 0.0.0.3
+ no auto-summary
+exit
+!
+access-list 10 permit 192.168.40.0 0.0.0.255
+access-list 20 permit host 192.168.99.10
+snmp-server community redes2 RO 20
+snmp-server location Pamplona
+line con 0
+ logging synchronous
+ exec-timeout 0 0
+line vty 0 4
+ access-class 10 in
+ login local
+ transport input ssh
+exit
+crypto key generate rsa modulus 1024
+ip ssh version 2
+end
+write memory</code></pre></div>
+      <div class="code"><div class="cap"><span>Bloque 2 de 2 · redistribución RIP ↔ EIGRP</span></div><pre><code>configure terminal
+router eigrp 100
+ redistribute rip metric 10000 100 255 1 1500
+exit
+router rip
+ redistribute eigrp 100 metric 3
+exit
+end
+write memory</code></pre></div>
+    </div>
+  </article>
+  <article class="dev" data-dev="lan-sw">
+    <div class="dev-h"><div class="id"><h3>S3, S4, S5, S6, S7</h3><span class="tag t-net">Switches de LAN</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-lansw">Configurados</label></div>
+    <div class="dev-b">
+      <p>Son switches simples en VLAN 1. Pega el mismo bloque en los cinco cambiando solo el nombre en la tercera línea (S3, S4, S5, S6, S7).</p>
+      <div class="code"><div class="cap"><span>S3 (repetir en S4–S7)</span></div><pre><code>enable
+configure terminal
+hostname S3
+no ip domain-lookup
+interface range Ethernet0/0 - 3
+ switchport mode access
+ switchport access vlan 1
+ spanning-tree portfast
+ no shutdown
+end
+write memory</code></pre></div>
+    </div>
+  </article>
+  </div>
+</section>
+
+<!-- ================= 06 EIGRP ================= -->
+<section id="eigrp">
+  <div class="sec-head"><span class="eyebrow">06 · Dominio EIGRP</span><h2>R3 a R8 · sistema autónomo 100</h2></div>
+  <p class="lead">Anillo de seis sedes. Las loopback 172.16.X.0/24 simulan la LAN de cada sede (el PDF pide “varias redes LAN de sedes”). R3 además corre OSPF hacia R9 y redistribuye.</p>
+  <div class="devs">
+  <article class="dev" data-dev="r3">
+    <div class="dev-h"><div class="id"><h3>R3-PAIPA</h3><span class="tag t-eigrp">EIGRP</span><span class="tag t-ospf">OSPF</span><span class="img">ASBR EIGRP ↔ OSPF</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-r3">Configurado</label></div>
+    <div class="dev-b">
+      <div class="ifs"><span>e0/0 <b>192.168.16.1/30</b></span><span>e0/1 <b>192.168.17.1/30</b></span><span>e0/2 <b>192.168.24.2/30</b></span><span>Lo0 <b>172.16.3.1/24</b></span></div>
+      <div class="code"><div class="cap"><span>Bloque 1 de 2 · configuración completa</span></div><pre><code>enable
+configure terminal
+hostname R3-PAIPA
+no ip domain-lookup
+ip domain-name redes2.local
+service password-encryption
+enable secret Redes2*
+username admin privilege 15 secret Admin2026*
+banner motd #R3-PAIPA - Acceso solo desde VLAN 40#
+!
+interface Loopback0
+ description LAN-SIMULADA-PAIPA
+ ip address 172.16.3.1 255.255.255.0
+interface Ethernet0/0
+ description EIGRP-R4-BUCARAMANGA
+ ip address 192.168.16.1 255.255.255.252
+ no shutdown
+interface Ethernet0/1
+ description EIGRP-R8-MEDELLIN
+ ip address 192.168.17.1 255.255.255.252
+ no shutdown
+interface Ethernet0/2
+ description OSPF-R9-TUNJA
+ ip address 192.168.24.2 255.255.255.252
+ no shutdown
+exit
+!
+router eigrp 100
+ eigrp router-id 3.3.3.3
+ network 192.168.16.0 0.0.0.3
+ network 192.168.17.0 0.0.0.3
+ network 172.16.3.0 0.0.0.255
+ no auto-summary
+exit
+router ospf 1
+ router-id 3.3.3.3
+ network 192.168.24.0 0.0.0.3 area 0
+exit
+!
+access-list 10 permit 192.168.40.0 0.0.0.255
+access-list 20 permit host 192.168.99.10
+snmp-server community redes2 RO 20
+snmp-server location Paipa
+line con 0
+ logging synchronous
+ exec-timeout 0 0
+line vty 0 4
+ access-class 10 in
+ login local
+ transport input ssh
+exit
+crypto key generate rsa modulus 1024
+ip ssh version 2
+end
+write memory</code></pre></div>
+      <div class="code"><div class="cap"><span>Bloque 2 de 2 · redistribución EIGRP ↔ OSPF + ruta por defecto hacia OSPF</span></div><pre><code>configure terminal
+router eigrp 100
+ redistribute ospf 1 metric 10000 100 255 1 1500
+exit
+router ospf 1
+ redistribute eigrp 100 subnets
+ default-information originate
+exit
+end
+write memory</code></pre></div>
+    </div>
+  </article>
+
+  <article class="dev" data-dev="r4">
+    <div class="dev-h"><div class="id"><h3>R4-BUCARAMANGA</h3><span class="tag t-eigrp">EIGRP</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-r4">Configurado</label></div>
+    <div class="dev-b">
+      <div class="ifs"><span>e0/0 <b>192.168.16.2/30</b></span><span>e0/1 <b>192.168.21.2/30</b></span><span>Lo0 <b>172.16.4.1/24</b></span></div>
+      <div class="code"><div class="cap"><span>R4 · configuración completa</span></div><pre><code>enable
+configure terminal
+hostname R4-BUCARAMANGA
+no ip domain-lookup
+ip domain-name redes2.local
+service password-encryption
+enable secret Redes2*
+username admin privilege 15 secret Admin2026*
+banner motd #R4-BUCARAMANGA - Acceso solo desde VLAN 40#
+!
+interface Loopback0
+ description LAN-SEDE-BUCARAMANGA
+ ip address 172.16.4.1 255.255.255.0
+interface Ethernet0/0
+ description EIGRP-R3-PAIPA
+ ip address 192.168.16.2 255.255.255.252
+ no shutdown
+interface Ethernet0/1
+ description EIGRP-R5-BARRANCABERMEJA
+ ip address 192.168.21.2 255.255.255.252
+ no shutdown
+exit
+!
+router eigrp 100
+ eigrp router-id 4.4.4.4
+ network 192.168.16.0 0.0.0.3
+ network 192.168.21.0 0.0.0.3
+ network 172.16.4.0 0.0.0.255
+ no auto-summary
+exit
+!
+access-list 10 permit 192.168.40.0 0.0.0.255
+access-list 20 permit host 192.168.99.10
+snmp-server community redes2 RO 20
+snmp-server location Bucaramanga
+line con 0
+ logging synchronous
+ exec-timeout 0 0
+line vty 0 4
+ access-class 10 in
+ login local
+ transport input ssh
+exit
+crypto key generate rsa modulus 1024
+ip ssh version 2
+end
+write memory</code></pre></div>
+    </div>
+  </article>
+
+  <article class="dev" data-dev="r5">
+    <div class="dev-h"><div class="id"><h3>R5-BARRANCABERMEJA</h3><span class="tag t-eigrp">EIGRP</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-r5">Configurado</label></div>
+    <div class="dev-b">
+      <div class="ifs"><span>e0/0 <b>192.168.21.1/30</b></span><span>e0/1 <b>192.168.22.1/30</b></span><span>Lo0 <b>172.16.5.1/24</b></span></div>
+      <div class="code"><div class="cap"><span>R5 · configuración completa</span></div><pre><code>enable
+configure terminal
+hostname R5-BARRANCABERMEJA
+no ip domain-lookup
+ip domain-name redes2.local
+service password-encryption
+enable secret Redes2*
+username admin privilege 15 secret Admin2026*
+banner motd #R5-BARRANCABERMEJA - Acceso solo desde VLAN 40#
+!
+interface Loopback0
+ description LAN-SEDE-BARRANCABERMEJA
+ ip address 172.16.5.1 255.255.255.0
+interface Ethernet0/0
+ description EIGRP-R4-BUCARAMANGA
+ ip address 192.168.21.1 255.255.255.252
+ no shutdown
+interface Ethernet0/1
+ description EIGRP-R6-CUCUTA
+ ip address 192.168.22.1 255.255.255.252
+ no shutdown
+exit
+!
+router eigrp 100
+ eigrp router-id 5.5.5.5
+ network 192.168.21.0 0.0.0.3
+ network 192.168.22.0 0.0.0.3
+ network 172.16.5.0 0.0.0.255
+ no auto-summary
+exit
+!
+access-list 10 permit 192.168.40.0 0.0.0.255
+access-list 20 permit host 192.168.99.10
+snmp-server community redes2 RO 20
+snmp-server location Barrancabermeja
+line con 0
+ logging synchronous
+ exec-timeout 0 0
+line vty 0 4
+ access-class 10 in
+ login local
+ transport input ssh
+exit
+crypto key generate rsa modulus 1024
+ip ssh version 2
+end
+write memory</code></pre></div>
+    </div>
+  </article>
+
+  <article class="dev" data-dev="r6">
+    <div class="dev-h"><div class="id"><h3>R6-CUCUTA</h3><span class="tag t-eigrp">EIGRP</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-r6">Configurado</label></div>
+    <div class="dev-b">
+      <div class="ifs"><span>e0/0 <b>192.168.22.2/30</b></span><span>e0/1 <b>192.168.19.2/30</b></span><span>e0/2 <b>192.168.25.1/30</b></span><span>Lo0 <b>172.16.6.1/24</b></span></div>
+      <div class="code"><div class="cap"><span>R6 · configuración completa</span></div><pre><code>enable
+configure terminal
+hostname R6-CUCUTA
+no ip domain-lookup
+ip domain-name redes2.local
+service password-encryption
+enable secret Redes2*
+username admin privilege 15 secret Admin2026*
+banner motd #R6-CUCUTA - Acceso solo desde VLAN 40#
+!
+interface Loopback0
+ description LAN-SEDE-CUCUTA
+ ip address 172.16.6.1 255.255.255.0
+interface Ethernet0/0
+ description EIGRP-R5-BARRANCABERMEJA
+ ip address 192.168.22.2 255.255.255.252
+ no shutdown
+interface Ethernet0/1
+ description EIGRP-R7-BOGOTA
+ ip address 192.168.19.2 255.255.255.252
+ no shutdown
+interface Ethernet0/2
+ description EIGRP-R1-PAMPLONA
+ ip address 192.168.25.1 255.255.255.252
+ no shutdown
+exit
+!
+router eigrp 100
+ eigrp router-id 6.6.6.6
+ network 192.168.22.0 0.0.0.3
+ network 192.168.19.0 0.0.0.3
+ network 192.168.25.0 0.0.0.3
+ network 172.16.6.0 0.0.0.255
+ no auto-summary
+exit
+!
+access-list 10 permit 192.168.40.0 0.0.0.255
+access-list 20 permit host 192.168.99.10
+snmp-server community redes2 RO 20
+snmp-server location Cucuta
+line con 0
+ logging synchronous
+ exec-timeout 0 0
+line vty 0 4
+ access-class 10 in
+ login local
+ transport input ssh
+exit
+crypto key generate rsa modulus 1024
+ip ssh version 2
+end
+write memory</code></pre></div>
+    </div>
+  </article>
+
+  <article class="dev" data-dev="r7">
+    <div class="dev-h"><div class="id"><h3>R7-BOGOTA</h3><span class="tag t-eigrp">EIGRP</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-r7">Configurado</label></div>
+    <div class="dev-b">
+      <div class="ifs"><span>e0/0 <b>192.168.19.1/30</b></span><span>e0/1 <b>192.168.18.1/30</b></span><span>Lo0 <b>172.16.7.1/24</b></span></div>
+      <div class="code"><div class="cap"><span>R7 · configuración completa</span></div><pre><code>enable
+configure terminal
+hostname R7-BOGOTA
+no ip domain-lookup
+ip domain-name redes2.local
+service password-encryption
+enable secret Redes2*
+username admin privilege 15 secret Admin2026*
+banner motd #R7-BOGOTA - Acceso solo desde VLAN 40#
+!
+interface Loopback0
+ description LAN-SEDE-BOGOTA
+ ip address 172.16.7.1 255.255.255.0
+interface Ethernet0/0
+ description EIGRP-R6-CUCUTA
+ ip address 192.168.19.1 255.255.255.252
+ no shutdown
+interface Ethernet0/1
+ description EIGRP-R8-MEDELLIN
+ ip address 192.168.18.1 255.255.255.252
+ no shutdown
+exit
+!
+router eigrp 100
+ eigrp router-id 7.7.7.7
+ network 192.168.19.0 0.0.0.3
+ network 192.168.18.0 0.0.0.3
+ network 172.16.7.0 0.0.0.255
+ no auto-summary
+exit
+!
+access-list 10 permit 192.168.40.0 0.0.0.255
+access-list 20 permit host 192.168.99.10
+snmp-server community redes2 RO 20
+snmp-server location Bogota
+line con 0
+ logging synchronous
+ exec-timeout 0 0
+line vty 0 4
+ access-class 10 in
+ login local
+ transport input ssh
+exit
+crypto key generate rsa modulus 1024
+ip ssh version 2
+end
+write memory</code></pre></div>
+    </div>
+  </article>
+
+  <article class="dev" data-dev="r8">
+    <div class="dev-h"><div class="id"><h3>R8-MEDELLIN</h3><span class="tag t-eigrp">EIGRP</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-r8">Configurado</label></div>
+    <div class="dev-b">
+      <div class="ifs"><span>e0/0 <b>192.168.17.2/30</b></span><span>e0/1 <b>192.168.18.2/30</b></span><span>e0/2 <b>192.168.50.1/24</b></span></div>
+      <div class="code"><div class="cap"><span>R8 · configuración completa</span></div><pre><code>enable
+configure terminal
+hostname R8-MEDELLIN
+no ip domain-lookup
+ip domain-name redes2.local
+service password-encryption
+enable secret Redes2*
+username admin privilege 15 secret Admin2026*
+banner motd #R8-MEDELLIN - Acceso solo desde VLAN 40#
+!
+interface Ethernet0/0
+ description EIGRP-R3-PAIPA
+ ip address 192.168.17.2 255.255.255.252
+ no shutdown
+interface Ethernet0/1
+ description EIGRP-R7-BOGOTA
+ ip address 192.168.18.2 255.255.255.252
+ no shutdown
+interface Ethernet0/2
+ description LAN-MEDELLIN-S7
+ ip address 192.168.50.1 255.255.255.0
+ no shutdown
+exit
+!
+router eigrp 100
+ eigrp router-id 8.8.8.8
+ network 192.168.17.0 0.0.0.3
+ network 192.168.18.0 0.0.0.3
+ network 192.168.50.0 0.0.0.255
+ passive-interface Ethernet0/2
+ no auto-summary
+exit
+!
+access-list 10 permit 192.168.40.0 0.0.0.255
+access-list 20 permit host 192.168.99.10
+snmp-server community redes2 RO 20
+snmp-server location Medellin
+line con 0
+ logging synchronous
+ exec-timeout 0 0
+line vty 0 4
+ access-class 10 in
+ login local
+ transport input ssh
+exit
+crypto key generate rsa modulus 1024
+ip ssh version 2
+end
+write memory</code></pre></div>
+    </div>
+  </article>
+  </div>
+</section>
+
+<!-- ================= 07 OSPF ================= -->
+<section id="ospf">
+  <div class="sec-head"><span class="eyebrow">07 · Dominio OSPF multimarca</span><h2>R9, R10 (ABR) y R11 MikroTik</h2></div>
+  <p class="lead">Área 0: R3, R9, R10 y sus LAN. Área 1: enlace R10–R11 y LAN Sogamoso. Las interfaces de LAN van como <code>passive-interface</code> para no enviar paquetes OSPF hacia los PCs.</p>
+  <div class="devs">
+  <article class="dev" data-dev="r9">
+    <div class="dev-h"><div class="id"><h3>R9-TUNJA</h3><span class="tag t-ospf">OSPF área 0</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-r9">Configurado</label></div>
+    <div class="dev-b">
+      <div class="ifs"><span>e0/0 <b>192.168.24.1/30</b></span><span>e0/1 <b>10.0.0.1/30</b></span><span>e0/2 <b>192.168.5.1/24</b></span></div>
+      <div class="code"><div class="cap"><span>R9 · configuración completa</span></div><pre><code>enable
+configure terminal
+hostname R9-TUNJA
+no ip domain-lookup
+ip domain-name redes2.local
+service password-encryption
+enable secret Redes2*
+username admin privilege 15 secret Admin2026*
+banner motd #R9-TUNJA - Acceso solo desde VLAN 40#
+!
+interface Ethernet0/0
+ description OSPF-R3-PAIPA
+ ip address 192.168.24.1 255.255.255.252
+ no shutdown
+interface Ethernet0/1
+ description OSPF-R10-DUITAMA
+ ip address 10.0.0.1 255.255.255.252
+ no shutdown
+interface Ethernet0/2
+ description LAN-TUNJA-S4
+ ip address 192.168.5.1 255.255.255.0
+ no shutdown
+exit
+!
+router ospf 1
+ router-id 9.9.9.9
+ network 192.168.24.0 0.0.0.3 area 0
+ network 10.0.0.0 0.0.0.3 area 0
+ network 192.168.5.0 0.0.0.255 area 0
+ passive-interface Ethernet0/2
+exit
+!
+access-list 10 permit 192.168.40.0 0.0.0.255
+access-list 20 permit host 192.168.99.10
+snmp-server community redes2 RO 20
+snmp-server location Tunja
+line con 0
+ logging synchronous
+ exec-timeout 0 0
+line vty 0 4
+ access-class 10 in
+ login local
+ transport input ssh
+exit
+crypto key generate rsa modulus 1024
+ip ssh version 2
+end
+write memory</code></pre></div>
+    </div>
+  </article>
+
+  <article class="dev" data-dev="r10">
+    <div class="dev-h"><div class="id"><h3>R10-DUITAMA</h3><span class="tag t-ospf">ABR área 0 / 1</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-r10">Configurado</label></div>
+    <div class="dev-b">
+      <div class="ifs"><span>e0/0 <b>10.0.0.2/30</b></span><span>e0/1 <b>10.0.0.5/30</b></span><span>e0/2 <b>192.168.6.1/24</b></span></div>
+      <div class="code"><div class="cap"><span>R10 · configuración completa</span></div><pre><code>enable
+configure terminal
+hostname R10-DUITAMA
+no ip domain-lookup
+ip domain-name redes2.local
+service password-encryption
+enable secret Redes2*
+username admin privilege 15 secret Admin2026*
+banner motd #R10-DUITAMA - Acceso solo desde VLAN 40#
+!
+interface Ethernet0/0
+ description OSPF-AREA0-R9-TUNJA
+ ip address 10.0.0.2 255.255.255.252
+ no shutdown
+interface Ethernet0/1
+ description OSPF-AREA1-R11-SOGAMOSO-MIKROTIK
+ ip address 10.0.0.5 255.255.255.252
+ ip ospf mtu-ignore
+ no shutdown
+interface Ethernet0/2
+ description LAN-DUITAMA-S5
+ ip address 192.168.6.1 255.255.255.0
+ no shutdown
+exit
+!
+router ospf 1
+ router-id 10.10.10.10
+ network 10.0.0.0 0.0.0.3 area 0
+ network 192.168.6.0 0.0.0.255 area 0
+ network 10.0.0.4 0.0.0.3 area 1
+ passive-interface Ethernet0/2
+exit
+!
+access-list 10 permit 192.168.40.0 0.0.0.255
+access-list 20 permit host 192.168.99.10
+snmp-server community redes2 RO 20
+snmp-server location Duitama
+line con 0
+ logging synchronous
+ exec-timeout 0 0
+line vty 0 4
+ access-class 10 in
+ login local
+ transport input ssh
+exit
+crypto key generate rsa modulus 1024
+ip ssh version 2
+end
+write memory</code></pre></div>
+    </div>
+  </article>
+
+  <article class="dev" data-dev="r11">
+    <div class="dev-h"><div class="id"><h3>R11-SOGAMOSO</h3><span class="tag t-ospf">OSPF área 1</span><span class="img">MikroTik CHR · multimarca</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-r11">Configurado</label></div>
+    <div class="dev-b">
+      <div class="ifs"><span>ether1 <b>10.0.0.6/30</b></span><span>ether2 <b>192.168.7.1/24</b></span></div>
+      <p>Login: <code>admin</code> sin clave. Responde <code>n</code> a la licencia y pon una clave nueva si la pide. Mira la versión con <code>/system resource print</code> y usa el bloque que corresponda.</p>
+      <div class="code"><div class="cap"><span>RouterOS 7.x · configuración completa</span></div><pre><code>/system identity set name=R11-SOGAMOSO
+/ip address add address=10.0.0.6/30 interface=ether1 comment="OSPF area 1 - R10 Duitama"
+/ip address add address=192.168.7.1/24 interface=ether2 comment="LAN Sogamoso"
+/routing ospf instance add name=ospf-redes2 version=2 router-id=11.11.11.11
+/routing ospf area add name=area1 area-id=0.0.0.1 instance=ospf-redes2
+/routing ospf interface-template add area=area1 networks=10.0.0.4/30
+/routing ospf interface-template add area=area1 networks=192.168.7.0/24 passive
+/snmp community add name=redes2 addresses=192.168.99.10/32
+/snmp set enabled=yes contact="Proyecto Redes II" location="Sogamoso"
+/ip service set telnet disabled=yes
+/ip service set ssh address=192.168.40.0/24
+/ip service set winbox address=192.168.40.0/24
+/user set admin password=Admin2026*</code></pre></div>
+      <details class="alt"><summary>RouterOS 6.x (si tu imagen es la versión 6)</summary>
+      <div class="code"><div class="cap"><span>RouterOS 6.x · configuración completa</span></div><pre><code>/system identity set name=R11-SOGAMOSO
+/ip address add address=10.0.0.6/30 interface=ether1 comment="OSPF area 1 - R10 Duitama"
+/ip address add address=192.168.7.1/24 interface=ether2 comment="LAN Sogamoso"
+/routing ospf instance set [find default=yes] router-id=11.11.11.11
+/routing ospf area add name=area1 area-id=0.0.0.1
+/routing ospf network add network=10.0.0.4/30 area=area1
+/routing ospf network add network=192.168.7.0/24 area=area1
+/routing ospf interface add interface=ether2 passive=yes
+/snmp community add name=redes2 addresses=192.168.99.10/32
+/snmp set enabled=yes contact="Proyecto Redes II" location="Sogamoso"
+/ip service set telnet disabled=yes
+/ip service set ssh address=192.168.40.0/24
+/ip service set winbox address=192.168.40.0/24
+/user set admin password=Admin2026*</code></pre></div>
+      </details>
+      <div class="code"><div class="cap"><span>R11 · verificación (capturas)</span></div><pre><code>/routing ospf neighbor print
+/ip route print where ospf
+/routing ospf lsa print
+/ping 192.168.50.10 count=4
+/tool traceroute 192.168.15.10</code></pre></div>
+    </div>
+  </article>
+  </div>
+</section>
+
+<!-- ================= 08 HOSTS ================= -->
+<section id="hosts">
+  <div class="sec-head"><span class="eyebrow">08 · PCs</span><h2>VPCS: IP, gateway y DNS</h2></div>
+  <p class="lead">Abre cada VPCS y pega su línea. <code>save</code> deja la configuración guardada para cuando reinicies el lab.</p>
+  <div class="mini">
+    <article class="dev" data-dev="pc-v10"><div class="dev-h"><div class="id"><h4 class="v10">VLAN 10</h4></div><label class="done"><input type="checkbox" class="chk-dev" id="d-pc10">Listos</label></div>
+      <div class="dev-b">
+        <div class="code"><div class="cap"><span>PC14</span></div><pre><code>ip 192.168.10.12/24 192.168.10.1
+ip dns 192.168.20.3
+save</code></pre></div>
+        <div class="code"><div class="cap"><span>VPC</span></div><pre><code>ip 192.168.10.11/24 192.168.10.1
+ip dns 192.168.20.3
+save</code></pre></div>
+        <div class="code"><div class="cap"><span>VPC4</span></div><pre><code>ip 192.168.10.10/24 192.168.10.1
+ip dns 192.168.20.3
+save</code></pre></div>
+        <div class="code"><div class="cap"><span>VPC32 · por DHCP</span></div><pre><code>ip dhcp
+save</code></pre></div>
+      </div></article>
+    <article class="dev" data-dev="pc-v20"><div class="dev-h"><div class="id"><h4 class="v20">VLAN 20</h4></div><label class="done"><input type="checkbox" class="chk-dev" id="d-pc20">Listos</label></div>
+      <div class="dev-b">
+        <div class="code"><div class="cap"><span>VPC2</span></div><pre><code>ip 192.168.20.11/24 192.168.20.1
+ip dns 192.168.20.3
+save</code></pre></div>
+        <div class="code"><div class="cap"><span>VPC5</span></div><pre><code>ip 192.168.20.10/24 192.168.20.1
+ip dns 192.168.20.3
+save</code></pre></div>
+      </div></article>
+    <article class="dev" data-dev="pc-v30"><div class="dev-h"><div class="id"><h4 class="v30">VLAN 30</h4></div><label class="done"><input type="checkbox" class="chk-dev" id="d-pc30">Listos</label></div>
+      <div class="dev-b">
+        <div class="code"><div class="cap"><span>VPC10</span></div><pre><code>ip 192.168.30.12/24 192.168.30.1
+ip dns 192.168.20.3
+save</code></pre></div>
+        <div class="code"><div class="cap"><span>PC13</span></div><pre><code>ip 192.168.30.32/24 192.168.30.1
+ip dns 192.168.20.3
+save</code></pre></div>
+        <div class="code"><div class="cap"><span>VPC11</span></div><pre><code>ip 192.168.30.11/24 192.168.30.1
+ip dns 192.168.20.3
+save</code></pre></div>
+      </div></article>
+    <article class="dev" data-dev="pc-v40"><div class="dev-h"><div class="id"><h4 class="v40">VLAN 40</h4></div><label class="done"><input type="checkbox" class="chk-dev" id="d-pc40">Listos</label></div>
+      <div class="dev-b">
+        <div class="code"><div class="cap"><span>VPC3 · IP par</span></div><pre><code>ip 192.168.40.10/24 192.168.40.1
+ip dns 192.168.20.3
+save</code></pre></div>
+        <div class="code"><div class="cap"><span>VPC12 · IP impar</span></div><pre><code>ip 192.168.40.11/24 192.168.40.1
+ip dns 192.168.20.3
+save</code></pre></div>
+      </div></article>
+    <article class="dev" data-dev="pc-otros"><div class="dev-h"><div class="id"><h4>LAN de sedes</h4></div><label class="done"><input type="checkbox" class="chk-dev" id="d-pcs">Listos</label></div>
+      <div class="dev-b">
+        <div class="code"><div class="cap"><span>CISCOIP-1 · Pamplona</span></div><pre><code>ip 192.168.15.10/24 192.168.15.1
+save</code></pre></div>
+        <div class="code"><div class="cap"><span>PC-MEDELLIN</span></div><pre><code>ip 192.168.50.10/24 192.168.50.1
+save</code></pre></div>
+        <div class="code"><div class="cap"><span>PC-9 · Tunja</span></div><pre><code>ip 192.168.5.11/24 192.168.5.1
+save</code></pre></div>
+        <div class="code"><div class="cap"><span>PC-10 · Duitama</span></div><pre><code>ip 192.168.6.12/24 192.168.6.1
+save</code></pre></div>
+        <div class="code"><div class="cap"><span>PC-11 · Sogamoso</span></div><pre><code>ip 192.168.7.13/24 192.168.7.1
+save</code></pre></div>
+      </div></article>
+  </div>
+</section>
+
+<!-- ================= 09 SRV ================= -->
+<section id="srv">
+  <div class="sec-head"><span class="eyebrow">09 · Servidor de monitoreo</span><h2>SRV-MON: Ubuntu con Zabbix, Grafana y n8n</h2></div>
+  <p class="lead">Un solo Ubuntu en la VLAN 99 (192.168.99.10) aloja los tres servicios. Gracias al port-forward de R2 lo administras desde Windows con MobaXterm y el navegador.</p>
+  <div class="note"><b>Orden de los scripts</b><p>Apenas R2, SW1 y SW2 estén listos, haz los pasos <b>A → B → C → D → E</b> (instalan Zabbix, Grafana y n8n; mientras corren, configura los demás routers en otras pestañas). Cuando toda la red funcione, haz <b>F</b> (agregar equipos a Zabbix) y sigue a la sección 12: crear el bot de Telegram, <b>G</b> (alertas) y <b>H</b> (flujo del bot).</p></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Servicio</th><th>Desde tu PC Windows</th><th>Credenciales</th></tr></thead>
+    <tbody>
+      <tr><td>SSH (MobaXterm)</td><td class="m"><span class="phi" data-k="WAN"></span> puerto 2222</td><td>usuario de la imagen Ubuntu</td></tr>
+      <tr><td>Zabbix</td><td class="m">http://<span class="phi" data-k="WAN"></span>:8080/zabbix</td><td class="m">Admin / zabbix</td></tr>
+      <tr><td>Grafana</td><td class="m">http://<span class="phi" data-k="WAN"></span>:3000</td><td class="m">admin / admin</td></tr>
+      <tr><td>n8n</td><td class="m">http://<span class="phi" data-k="WAN"></span>:5678</td><td>creas la cuenta al entrar</td></tr>
+    </tbody>
+  </table></div>
+
+  <article class="dev" data-dev="srv1">
+    <div class="dev-h"><div class="id"><h3>Paso A · IP temporal y SSH</h3><span class="tag t-mon">consola VNC de PNETLab</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-srv1">Hecho</label></div>
+    <div class="dev-b">
+      <p>La consola del Ubuntu suele ser VNC (no deja pegar), así que aquí escribes solo estas líneas a mano. Primero mira el nombre de la interfaz con <code>ip -br link</code> (suele ser <code>ens3</code>; si es otro, cámbialo en las tres primeras líneas).</p>
+      <div class="code"><div class="cap"><span>Escribir en la consola del Ubuntu</span></div><pre><code>sudo ip link set ens3 up
+sudo ip addr add 192.168.99.10/24 dev ens3
+sudo ip route add default via 192.168.99.1
+echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+ping -c 3 8.8.8.8
+sudo apt update &amp;&amp; sudo apt install -y openssh-server &amp;&amp; sudo systemctl enable --now ssh</code></pre></div>
+      <p>Ahora en MobaXterm: <b>Session → SSH</b>, Remote host <span class="phi" data-k="WAN"></span>, puerto <b>2222</b>, usuario de la imagen. Ya conectado, conviértete en root:</p>
+      <div class="code"><div class="cap"><span>MobaXterm (SSH)</span></div><pre><code>sudo -i</code></pre></div>
+      <p class="lead" style="font-size:.85rem">Los scripts siguientes se pegan completos como root. Cada uno se guarda en <code>/root</code> y se ejecuta; si algo falla puedes volver a correrlo con <code>bash /root/NOMBRE.sh</code>.</p>
+    </div>
+  </article>
+
+  <article class="dev" data-dev="srv2">
+    <div class="dev-h"><div class="id"><h3>Paso B · red permanente y paquetes base</h3><span class="tag t-mon">root</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-srv2">Hecho</label></div>
+    <div class="dev-b">
+      <div class="code"><div class="cap"><span>01-base.sh</span></div><pre><code>cat &gt; /root/01-base.sh &lt;&lt;'EOF'
+#!/bin/bash
+set -e
+IF=$(ip -o -4 route show to default | awk '{print $5}' | head -1)
+[ -z "$IF" ] &amp;&amp; IF=$(ls /sys/class/net | grep -v '^lo$' | head -1)
+echo "&gt;&gt; Interfaz detectada: $IF"
+hostnamectl set-hostname srv-mon
+mkdir -p /etc/cloud/cloud.cfg.d /root/netplan-bak
+echo 'network: {config: disabled}' &gt; /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
+mv /etc/netplan/*.yaml /root/netplan-bak/ 2&gt;/dev/null || true
+cat &gt; /etc/netplan/01-redes2.yaml &lt;&lt;NETPLAN
+network:
+  version: 2
+  ethernets:
+    $IF:
+      dhcp4: false
+      addresses: [192.168.99.10/24]
+      routes:
+        - to: 0.0.0.0/0
+          via: 192.168.99.1
+      nameservers:
+        addresses: [8.8.8.8, 1.1.1.1]
+NETPLAN
+chmod 600 /etc/netplan/01-redes2.yaml
+netplan apply
+timedatectl set-timezone America/Bogota || true
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get install -y curl wget gnupg ca-certificates fping snmp jq python3 locales
+locale-gen es_ES.UTF-8 en_US.UTF-8
+echo "&gt;&gt; Base lista"
+EOF
+bash /root/01-base.sh</code></pre></div>
+    </div>
+  </article>
+</section>
+
+<!-- ================= 10 ZABBIX ================= -->
+<section id="zbx">
+  <div class="sec-head"><span class="eyebrow">10 · Zabbix 7.0 LTS</span><h2>Instalación y equipos monitoreados</h2></div>
+
+  <article class="dev" data-dev="zbx1">
+    <div class="dev-h"><div class="id"><h3>Paso C · instalar Zabbix (MySQL + Apache)</h3><span class="tag t-mon">≈ 8 min</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-zbx1">Hecho</label></div>
+    <div class="dev-b">
+      <p>Deja la base de datos, el servidor, el agente y la web listos, sin pasar por el asistente web.</p>
+      <div class="code"><div class="cap"><span>02-zabbix.sh</span></div><pre><code>cat &gt; /root/02-zabbix.sh &lt;&lt;'EOF'
+#!/bin/bash
+set -e
+. /etc/os-release
+DBPASS='Zabbix2026*'
+cd /tmp
+wget -q -O zabbix-release.deb "https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_7.0+ubuntu${VERSION_ID}_all.deb"
+dpkg -i zabbix-release.deb
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get install -y zabbix-server-mysql zabbix-frontend-php \
+  zabbix-apache-conf zabbix-sql-scripts zabbix-agent mysql-server fping
+systemctl enable --now mysql
+mysql -uroot &lt;&lt;SQL
+CREATE DATABASE IF NOT EXISTS zabbix CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+CREATE USER IF NOT EXISTS 'zabbix'@'localhost' IDENTIFIED BY '${DBPASS}';
+GRANT ALL PRIVILEGES ON zabbix.* TO 'zabbix'@'localhost';
+SET GLOBAL log_bin_trust_function_creators = 1;
+SQL
+if ! mysql -uroot -N -e "SHOW TABLES FROM zabbix LIKE 'users'" | grep -q users; then
+  echo "&gt;&gt; Importando esquema (tarda 1-3 min)..."
+  zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -p"${DBPASS}" zabbix
+fi
+mysql -uroot -e "SET GLOBAL log_bin_trust_function_creators = 0;"
+sed -i "s/^# DBPassword=.*/DBPassword=${DBPASS}/" /etc/zabbix/zabbix_server.conf
+cat &gt; /etc/zabbix/web/zabbix.conf.php &lt;&lt;PHP
+&lt;?php
+\$DB['TYPE'] = 'MYSQL'; \$DB['SERVER'] = 'localhost'; \$DB['PORT'] = '0';
+\$DB['DATABASE'] = 'zabbix'; \$DB['USER'] = 'zabbix'; \$DB['PASSWORD'] = '${DBPASS}';
+\$DB['SCHEMA'] = ''; \$DB['ENCRYPTION'] = false; \$DB['KEY_FILE'] = ''; \$DB['CERT_FILE'] = '';
+\$DB['CA_FILE'] = ''; \$DB['VERIFY_HOST'] = false; \$DB['CIPHER_LIST'] = '';
+\$DB['VAULT'] = ''; \$DB['VAULT_URL'] = ''; \$DB['VAULT_PREFIX'] = ''; \$DB['VAULT_DB_PATH'] = '';
+\$DB['VAULT_TOKEN'] = ''; \$DB['VAULT_CERT_FILE'] = ''; \$DB['VAULT_KEY_FILE'] = '';
+\$DB['DOUBLE_IEEE754'] = true;
+\$ZBX_SERVER_NAME = 'Redes II - Monitoreo';
+\$IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;
+PHP
+chown www-data:www-data /etc/zabbix/web/zabbix.conf.php
+systemctl restart zabbix-server zabbix-agent apache2
+systemctl enable zabbix-server zabbix-agent apache2
+echo "&gt;&gt; Zabbix listo"
+EOF
+bash /root/02-zabbix.sh</code></pre></div>
+      <p>Abre <b>http://<span class="phi" data-k="WAN"></span>:8080/zabbix</b> → <code>Admin</code> / <code>zabbix</code>. Para ponerlo en español: User settings → Profile → Language.</p>
+    </div>
+  </article>
+
+  <article class="dev" data-dev="zbx2">
+    <div class="dev-h"><div class="id"><h3>Paso F · agregar todos los equipos (por API)</h3><span class="tag t-mon">después de configurar la red</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-zbx2">Hecho</label></div>
+    <div class="dev-b">
+      <p>Crea el grupo <b>Redes2</b> con 19 hosts: routers y switches por SNMP v2c + ICMP, MikroTik con la plantilla genérica SNMP, PCs solo por ICMP. Además crea dos chequeos de servicios críticos: HTTP del WEB-SERVER y resolución DNS de www.redes2.local. La plantilla <i>ICMP Ping</i> trae el disparador “Unavailable by ICMP ping”, que es la alerta por caída de equipos.</p>
+      <div class="code"><div class="cap"><span>04-zabbix-hosts.py</span></div><pre><code>cat &gt; /root/04-zabbix-hosts.py &lt;&lt;'EOF'
+#!/usr/bin/env python3
+import json, sys, urllib.request
+URL = "http://127.0.0.1/zabbix/api_jsonrpc.php"
+USER, PASS, GRUPO = "Admin", "zabbix", "Redes2"
+HOSTS = [  # nombre, IP de monitoreo, tipo
+    ("R1-PAMPLONA",        "192.168.15.1",  "cisco"),
+    ("R2-PAMPLONA",        "192.168.99.1",  "cisco"),
+    ("R3-PAIPA",           "172.16.3.1",    "cisco"),
+    ("R4-BUCARAMANGA",     "172.16.4.1",    "cisco"),
+    ("R5-BARRANCABERMEJA", "172.16.5.1",    "cisco"),
+    ("R6-CUCUTA",          "172.16.6.1",    "cisco"),
+    ("R7-BOGOTA",          "172.16.7.1",    "cisco"),
+    ("R8-MEDELLIN",        "192.168.50.1",  "cisco"),
+    ("R9-TUNJA",           "192.168.5.1",   "cisco"),
+    ("R10-DUITAMA",        "192.168.6.1",   "cisco"),
+    ("R11-SOGAMOSO",       "192.168.7.1",   "mikrotik"),
+    ("SW1",                "192.168.40.2",  "cisco"),
+    ("SW2",                "192.168.40.3",  "cisco"),
+    ("WEB-SERVER",         "192.168.30.2",  "cisco"),
+    ("DNS1",               "192.168.20.3",  "cisco"),
+    ("DHCP-SRV",           "192.168.10.2",  "cisco"),
+    ("PC-MEDELLIN",        "192.168.50.10", "icmp"),
+    ("PC-11",              "192.168.7.13",  "icmp"),
+    ("CISCOIP-1",          "192.168.15.10", "icmp"),
+]
+
+def api(method, params, tok=None):
+    body = json.dumps({"jsonrpc": "2.0", "method": method, "params": params, "id": 1}).encode()
+    req = urllib.request.Request(URL, body, {"Content-Type": "application/json-rpc"})
+    if tok:
+        req.add_header("Authorization", "Bearer " + tok)
+    res = json.load(urllib.request.urlopen(req, timeout=30))
+    if "error" in res:
+        raise RuntimeError(method + ": " + str(res["error"].get("data", res["error"])))
+    return res["result"]
+
+tok = api("user.login", {"username": USER, "password": PASS})
+g = api("hostgroup.get", {"output": ["groupid"], "filter": {"name": [GRUPO]}}, tok)
+gid = g[0]["groupid"] if g else api("hostgroup.create", {"name": GRUPO}, tok)["groupids"][0]
+
+def plantilla(nombre):
+    t = api("template.get", {"output": ["templateid"], "filter": {"host": [nombre]}}, tok)
+    if not t:
+        sys.exit("ERROR: no existe la plantilla " + nombre)
+    return t[0]["templateid"]
+
+T = {"icmp": plantilla("ICMP Ping"), "cisco": plantilla("Cisco IOS by SNMP"),
+     "gen": plantilla("Network Generic Device by SNMP")}
+TPL = {"cisco": ["icmp", "cisco"], "mikrotik": ["icmp", "gen"], "icmp": ["icmp"]}
+
+for nombre, ip, tipo in HOSTS:
+    if api("host.get", {"output": ["hostid"], "filter": {"host": [nombre]}}, tok):
+        print("= ya existe:", nombre)
+        continue
+    if tipo == "icmp":
+        iface = {"type": 1, "main": 1, "useip": 1, "ip": ip, "dns": "", "port": "10050"}
+    else:
+        iface = {"type": 2, "main": 1, "useip": 1, "ip": ip, "dns": "", "port": "161",
+                 "details": {"version": 2, "bulk": 1, "community": "{$SNMP_COMMUNITY}"}}
+    api("host.create", {"host": nombre, "groups": [{"groupid": gid}], "interfaces": [iface],
+                        "templates": [{"templateid": T[x]} for x in TPL[tipo]],
+                        "macros": [{"macro": "{$SNMP_COMMUNITY}", "value": "redes2"}]}, tok)
+    print("+ creado:", nombre, ip)
+
+def chequeo(host, key, tipo, nombre, desc):
+    h = api("host.get", {"output": ["hostid"], "selectInterfaces": ["interfaceid"],
+                         "filter": {"host": [host]}}, tok)
+    if not h:
+        print("! no existe el host", host)
+        return
+    api("host.update", {"hostid": h[0]["hostid"], "status": 0}, tok)
+    try:
+        api("item.create", {"name": nombre, "key_": key, "hostid": h[0]["hostid"], "type": tipo,
+                            "value_type": 3, "delay": "1m",
+                            "interfaceid": h[0]["interfaces"][0]["interfaceid"]}, tok)
+        api("trigger.create", {"description": desc, "priority": 4,
+                               "expression": "last(/%s/%s)=0" % (host, key)}, tok)
+        print("+ chequeo de servicio:", nombre)
+    except RuntimeError as e:
+        print("= chequeo ya existente:", nombre, "-", e)
+
+chequeo("WEB-SERVER", "net.tcp.service[http,192.168.30.2,80]", 3,
+        "Servicio HTTP del servidor web", "Servicio WEB caido en WEB-SERVER")
+chequeo("Zabbix server", "net.dns[192.168.20.3,www.redes2.local,A,2,1]", 0,
+        "Resolucion DNS www.redes2.local", "Servicio DNS no responde en DNS1")
+print("\nListo. Revisa Monitoring &gt; Hosts (grupo Redes2). SNMP tarda 1-3 min en ponerse verde.")
+EOF
+python3 /root/04-zabbix-hosts.py</code></pre></div>
+      <p>Prueba rápida de SNMP si un host queda en gris: <code>snmpwalk -v2c -c redes2 192.168.15.1 1.3.6.1.2.1.1</code></p>
+    </div>
+  </article>
+
+</section>
+
+<!-- ================= 11 GRAFANA ================= -->
+<section id="graf">
+  <div class="sec-head"><span class="eyebrow">11 · Grafana</span><h2>Instalación, integración con Zabbix y dashboard</h2></div>
+  <article class="dev" data-dev="graf1">
+    <div class="dev-h"><div class="id"><h3>Paso D · Grafana + plugin Zabbix + dashboard</h3><span class="tag t-mon">≈ 4 min</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-graf">Hecho</label></div>
+    <div class="dev-b">
+      <p>Instala Grafana, habilita el plugin oficial de Zabbix, crea la fuente de datos y carga el dashboard <b>Redes II - Estado de la red</b> (estado ICMP por equipo, problemas activos, latencia, tráfico de R2 y pérdida de paquetes). Córrelo <b>antes</b> de entrar por primera vez a Grafana, porque usa la clave inicial admin/admin.</p>
+      <div class="code"><div class="cap"><span>03-grafana.sh</span></div><pre><code>cat &gt; /root/03-grafana.sh &lt;&lt;'EOF'
+#!/bin/bash
+set -e
+apt-get install -y apt-transport-https software-properties-common wget gnupg
+mkdir -p /etc/apt/keyrings
+wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor --yes -o /etc/apt/keyrings/grafana.gpg
+echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" &gt; /etc/apt/sources.list.d/grafana.list
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get install -y grafana
+grafana-cli plugins install alexanderzobnin-zabbix-app || grafana cli plugins install alexanderzobnin-zabbix-app
+systemctl daemon-reload
+systemctl enable grafana-server
+systemctl restart grafana-server
+GF="http://admin:admin@127.0.0.1:3000"
+echo "&gt;&gt; Esperando a Grafana..."
+until curl -s http://127.0.0.1:3000/api/health | grep -q ok; do sleep 3; done
+curl -s -X POST -H "Content-Type: application/json" "$GF/api/plugins/alexanderzobnin-zabbix-app/settings" \
+  -d '{"enabled":true,"pinned":true,"jsonData":{}}'; echo
+curl -s -X POST -H "Content-Type: application/json" "$GF/api/datasources" -d '{
+  "name":"Zabbix","uid":"zabbix","type":"alexanderzobnin-zabbix-datasource","access":"proxy",
+  "url":"http://127.0.0.1/zabbix/api_jsonrpc.php","isDefault":true,
+  "jsonData":{"authType":"userLogin","username":"Admin","trends":true},
+  "secureJsonData":{"password":"zabbix"}}'; echo
+cat &gt; /root/dashboard-redes2.json &lt;&lt;'JSON'
+{
+ "dashboard": {
+  "uid": "redes2",
+  "title": "Redes II - Estado de la red",
+  "tags": [
+   "redes2"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "refresh": "30s",
+  "time": {
+   "from": "now-1h",
+   "to": "now"
+  },
+  "panels": [
+   {
+    "id": 1,
+    "type": "stat",
+    "title": "Estado ICMP por equipo",
+    "gridPos": {
+     "x": 0,
+     "y": 0,
+     "w": 24,
+     "h": 8
+    },
+    "datasource": {
+     "type": "alexanderzobnin-zabbix-datasource",
+     "uid": "zabbix"
+    },
+    "targets": [
+     {
+      "refId": "A",
+      "datasource": {
+       "type": "alexanderzobnin-zabbix-datasource",
+       "uid": "zabbix"
+      },
+      "queryType": "0",
+      "group": {
+       "filter": "Redes2"
+      },
+      "host": {
+       "filter": "/.*/"
+      },
+      "application": {
+       "filter": ""
+      },
+      "itemTag": {
+       "filter": ""
+      },
+      "item": {
+       "filter": "ICMP ping"
+      },
+      "functions": [],
+      "options": {
+       "showDisabledItems": false,
+       "skipEmptyValues": false
+      }
+     }
+    ],
+    "options": {
+     "reduceOptions": {
+      "calcs": [
+       "lastNotNull"
+      ],
+      "fields": "",
+      "values": false
+     },
+     "colorMode": "background",
+     "graphMode": "none",
+     "textMode": "value_and_name",
+     "orientation": "auto",
+     "justifyMode": "auto"
+    },
+    "fieldConfig": {
+     "defaults": {
+      "mappings": [
+       {
+        "type": "value",
+        "options": {
+         "0": {
+          "text": "CAÍDO",
+          "color": "red",
+          "index": 0
+         },
+         "1": {
+          "text": "EN LÍNEA",
+          "color": "green",
+          "index": 1
+         }
+        }
+       }
+      ],
+      "thresholds": {
+       "mode": "absolute",
+       "steps": [
+        {
+         "color": "red",
+         "value": null
+        },
+        {
+         "color": "green",
+         "value": 1
+        }
+       ]
+      }
+     },
+     "overrides": []
+    }
+   },
+   {
+    "id": 2,
+    "type": "alexanderzobnin-zabbix-triggers-panel",
+    "title": "Problemas activos (Zabbix)",
+    "gridPos": {
+     "x": 0,
+     "y": 8,
+     "w": 12,
+     "h": 10
+    },
+    "datasource": {
+     "type": "alexanderzobnin-zabbix-datasource",
+     "uid": "zabbix"
+    },
+    "targets": [
+     {
+      "refId": "A",
+      "datasource": {
+       "type": "alexanderzobnin-zabbix-datasource",
+       "uid": "zabbix"
+      },
+      "queryType": "5",
+      "group": {
+       "filter": "/.*/"
+      },
+      "host": {
+       "filter": "/.*/"
+      },
+      "application": {
+       "filter": ""
+      },
+      "itemTag": {
+       "filter": ""
+      },
+      "proxy": {
+       "filter": ""
+      },
+      "trigger": {
+       "filter": ""
+      },
+      "tags": {
+       "filter": ""
+      },
+      "showProblems": "problems",
+      "options": {
+       "minSeverity": 0,
+       "acknowledged": 2,
+       "sortProblems": "default",
+       "limit": 100,
+       "hostsInMaintenance": false
+      }
+     }
+    ]
+   },
+   {
+    "id": 3,
+    "type": "timeseries",
+    "title": "Latencia ICMP",
+    "gridPos": {
+     "x": 12,
+     "y": 8,
+     "w": 12,
+     "h": 10
+    },
+    "datasource": {
+     "type": "alexanderzobnin-zabbix-datasource",
+     "uid": "zabbix"
+    },
+    "targets": [
+     {
+      "refId": "A",
+      "datasource": {
+       "type": "alexanderzobnin-zabbix-datasource",
+       "uid": "zabbix"
+      },
+      "queryType": "0",
+      "group": {
+       "filter": "Redes2"
+      },
+      "host": {
+       "filter": "/.*/"
+      },
+      "application": {
+       "filter": ""
+      },
+      "itemTag": {
+       "filter": ""
+      },
+      "item": {
+       "filter": "ICMP response time"
+      },
+      "functions": [],
+      "options": {
+       "showDisabledItems": false,
+       "skipEmptyValues": false
+      }
+     }
+    ],
+    "fieldConfig": {
+     "defaults": {
+      "unit": "s"
+     },
+     "overrides": []
+    }
+   },
+   {
+    "id": 4,
+    "type": "timeseries",
+    "title": "Tráfico de R2 (borde / NAT)",
+    "gridPos": {
+     "x": 0,
+     "y": 18,
+     "w": 12,
+     "h": 9
+    },
+    "datasource": {
+     "type": "alexanderzobnin-zabbix-datasource",
+     "uid": "zabbix"
+    },
+    "targets": [
+     {
+      "refId": "A",
+      "datasource": {
+       "type": "alexanderzobnin-zabbix-datasource",
+       "uid": "zabbix"
+      },
+      "queryType": "0",
+      "group": {
+       "filter": "Redes2"
+      },
+      "host": {
+       "filter": "R2-PAMPLONA"
+      },
+      "application": {
+       "filter": ""
+      },
+      "itemTag": {
+       "filter": ""
+      },
+      "item": {
+       "filter": "/Bits (received|sent)/"
+      },
+      "functions": [],
+      "options": {
+       "showDisabledItems": false,
+       "skipEmptyValues": false
+      }
+     }
+    ],
+    "fieldConfig": {
+     "defaults": {
+      "unit": "bps"
+     },
+     "overrides": []
+    }
+   },
+   {
+    "id": 5,
+    "type": "bargauge",
+    "title": "Pérdida de paquetes ICMP",
+    "gridPos": {
+     "x": 12,
+     "y": 18,
+     "w": 12,
+     "h": 9
+    },
+    "datasource": {
+     "type": "alexanderzobnin-zabbix-datasource",
+     "uid": "zabbix"
+    },
+    "targets": [
+     {
+      "refId": "A",
+      "datasource": {
+       "type": "alexanderzobnin-zabbix-datasource",
+       "uid": "zabbix"
+      },
+      "queryType": "0",
+      "group": {
+       "filter": "Redes2"
+      },
+      "host": {
+       "filter": "/.*/"
+      },
+      "application": {
+       "filter": ""
+      },
+      "itemTag": {
+       "filter": ""
+      },
+      "item": {
+       "filter": "ICMP loss"
+      },
+      "functions": [],
+      "options": {
+       "showDisabledItems": false,
+       "skipEmptyValues": false
+      }
+     }
+    ],
+    "options": {
+     "reduceOptions": {
+      "calcs": [
+       "lastNotNull"
+      ],
+      "fields": "",
+      "values": false
+     },
+     "orientation": "horizontal",
+     "displayMode": "gradient"
+    },
+    "fieldConfig": {
+     "defaults": {
+      "unit": "percent",
+      "min": 0,
+      "max": 100,
+      "thresholds": {
+       "mode": "absolute",
+       "steps": [
+        {
+         "color": "green",
+         "value": null
+        },
+        {
+         "color": "orange",
+         "value": 20
+        },
+        {
+         "color": "red",
+         "value": 50
+        }
+       ]
+      }
+     },
+     "overrides": []
+    }
+   }
+  ]
+ },
+ "overwrite": true
+}
+JSON
+curl -s -X POST -H "Content-Type: application/json" "$GF/api/dashboards/db" -d @/root/dashboard-redes2.json; echo
+echo "&gt;&gt; Grafana listo: dashboard /d/redes2"
+EOF
+bash /root/03-grafana.sh</code></pre></div>
+      <ol class="steps">
+        <li>Entra a <b>http://<span class="phi" data-k="WAN"></span>:3000</b> (admin/admin, te pedirá cambiar la clave).</li>
+        <li>Connections → Data sources → <b>Zabbix</b> → <b>Save &amp; test</b>: debe decir <i>Zabbix API version 7.0…</i> (evidencia 19).</li>
+        <li>Dashboards → <b>Redes II - Estado de la red</b> (evidencia 18). Si el panel de problemas sale vacío o con error, edítalo y elige Query type <i>Problems</i>, Group <code>/.*/</code>.</li>
+        <li>Extra rápido: Administration → Plugins → Zabbix → pestaña <b>Dashboards</b> → importa <i>Zabbix Server Dashboard</i>.</li>
+      </ol>
+    </div>
+  </article>
+</section>
+
+<!-- ================= 12 N8N ================= -->
+<section id="n8n">
+  <div class="sec-head"><span class="eyebrow">12 · Telegram y automatización</span><h2>Bot de Telegram, alertas y n8n</h2></div>
+  <p class="lead">Telegram solo entrega mensajes a una URL HTTPS pública. El script levanta n8n en Docker y un túnel gratuito de Cloudflare (sin cuenta) que le da esa URL.</p>
+
+  <article class="dev" data-dev="n8n1">
+    <div class="dev-h"><div class="id"><h3>Paso E · Docker, n8n y túnel HTTPS</h3><span class="tag t-mon">≈ 4 min</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-n8n1">Hecho</label></div>
+    <div class="dev-b">
+      <div class="code"><div class="cap"><span>05-n8n.sh</span></div><pre><code>cat &gt; /root/05-n8n.sh &lt;&lt;'EOF'
+#!/bin/bash
+set -e
+command -v docker &gt;/dev/null || curl -fsSL https://get.docker.com | sh
+if ! command -v cloudflared &gt;/dev/null; then
+  curl -fsSL -o /tmp/cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+  dpkg -i /tmp/cloudflared.deb
+fi
+cat &gt; /usr/local/bin/n8n-up.sh &lt;&lt;'UP'
+#!/bin/bash
+# Arranca el tunel y n8n con la URL publica (correr cada vez que reinicies el lab)
+pkill -f "cloudflared tunnel" 2&gt;/dev/null || true
+sleep 1
+: &gt; /var/log/cloudflared.log
+nohup cloudflared tunnel --no-autoupdate --protocol http2 --url http://localhost:5678 &gt;&gt; /var/log/cloudflared.log 2&gt;&amp;1 &amp;
+URL=""
+for i in $(seq 1 40); do
+  URL=$(grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' /var/log/cloudflared.log | head -1)
+  [ -n "$URL" ] &amp;&amp; break
+  sleep 2
+done
+if [ -z "$URL" ]; then echo "No se obtuvo la URL del tunel. Revisa /var/log/cloudflared.log"; exit 1; fi
+docker rm -f n8n &gt;/dev/null 2&gt;&amp;1 || true
+docker run -d --name n8n --restart unless-stopped -p 5678:5678 \
+  -e WEBHOOK_URL="$URL/" -e N8N_SECURE_COOKIE=false \
+  -e GENERIC_TIMEZONE=America/Bogota -e TZ=America/Bogota \
+  -v n8n_data:/home/node/.n8n docker.n8n.io/n8nio/n8n
+echo ""
+echo "n8n local:    http://192.168.99.10:5678"
+echo "URL publica:  $URL   (Telegram usa esta)"
+UP
+chmod +x /usr/local/bin/n8n-up.sh
+/usr/local/bin/n8n-up.sh
+EOF
+bash /root/05-n8n.sh</code></pre></div>
+      <div class="note warn"><b>Cada vez que reinicies el lab o el servidor</b><p>La URL del túnel cambia. Corre <code>n8n-up.sh</code> y luego en n8n desactiva y vuelve a activar el flujo para que Telegram apunte a la URL nueva.</p></div>
+    </div>
+  </article>
+
+  <article class="dev" data-dev="bot">
+    <div class="dev-h"><div class="id"><h3>Crear el bot de Telegram</h3><span class="tag t-mon">≈ 5 min</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-bot">Hecho</label></div>
+    <div class="dev-b">
+      <ol class="steps">
+        <li>En Telegram abre <b>@BotFather</b> → <code>/newbot</code> → nombre (ej. <i>Redes2 Monitor</i>) → usuario terminado en <code>bot</code> (ej. <code>redes2_tunombre_bot</code>). Copia el <b>token</b> en la casilla “Token del bot” de arriba de la página.</li>
+        <li>En BotFather: <code>/setcommands</code> → elige tu bot → pega el bloque de abajo.</li>
+        <li>Abre <b>@userinfobot</b>, escríbele cualquier cosa y copia tu <b>Id</b> en la casilla “Chat ID”.</li>
+        <li>Abre tu bot y pulsa <b>Iniciar</b> (si no, el bot no puede escribirte las alertas).</li>
+      </ol>
+      <div class="code"><div class="cap"><span>BotFather → /setcommands</span></div><pre><code>estado_red - Estado general de la red
+alertas - Problemas activos en Zabbix
+dispositivos_caidos - Equipos sin respuesta ICMP
+zabbix - Estado del servidor Zabbix
+grafana - Enlace y estado de Grafana
+resumen - Resumen ejecutivo de la red</code></pre></div>
+    </div>
+  </article>
+
+  <article class="dev" data-dev="zbx3">
+    <div class="dev-h"><div class="id"><h3>Paso G · alertas de caída por Telegram</h3><span class="tag t-mon">usa tu token y chat ID</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-zbx3">Hecho</label></div>
+    <div class="dev-b">
+      <p>Activa el tipo de medio <b>Telegram</b> que trae Zabbix, se lo asigna al usuario Admin con tu chat ID y habilita la acción <i>Report problems to Zabbix administrators</i>. Desde ese momento, cuando un equipo cae, Zabbix te escribe solo.</p>
+      <div class="code"><div class="cap"><span>06-zabbix-telegram.py</span></div><pre><code>cat &gt; /root/06-zabbix-telegram.py &lt;&lt;'EOF'
+#!/usr/bin/env python3
+import json, urllib.request
+URL = "http://127.0.0.1/zabbix/api_jsonrpc.php"
+BOT, CHAT = "%%BOT%%", "%%CHAT%%"
+
+def api(method, params, tok=None):
+    body = json.dumps({"jsonrpc": "2.0", "method": method, "params": params, "id": 1}).encode()
+    req = urllib.request.Request(URL, body, {"Content-Type": "application/json-rpc"})
+    if tok:
+        req.add_header("Authorization", "Bearer " + tok)
+    res = json.load(urllib.request.urlopen(req, timeout=30))
+    if "error" in res:
+        raise RuntimeError(method + ": " + str(res["error"].get("data", res["error"])))
+    return res["result"]
+
+tok = api("user.login", {"username": "Admin", "password": "zabbix"})
+mt = api("mediatype.get", {"output": "extend", "filter": {"name": ["Telegram"]}}, tok)[0]
+params = [{"name": p["name"], "value": BOT if p["name"] == "api_token" else p["value"]}
+          for p in mt["parameters"]]
+api("mediatype.update", {"mediatypeid": mt["mediatypeid"], "status": 0, "parameters": params}, tok)
+admin = api("user.get", {"output": ["userid"], "filter": {"username": ["Admin"]}}, tok)[0]
+api("user.update", {"userid": admin["userid"], "medias": [{
+    "mediatypeid": mt["mediatypeid"], "sendto": CHAT, "active": 0,
+    "severity": 63, "period": "1-7,00:00-24:00"}]}, tok)
+act = api("action.get", {"output": ["actionid"],
+                         "filter": {"name": ["Report problems to Zabbix administrators"]}}, tok)
+if act:
+    api("action.update", {"actionid": act[0]["actionid"], "status": 0}, tok)
+print("Listo: Telegram activado en Zabbix para el chat", CHAT)
+EOF
+python3 /root/06-zabbix-telegram.py</code></pre></div>
+      <p>Prueba: Alerts → Media types → Telegram → <b>Test</b>. Para la evidencia 20, apaga un router (clic derecho → Stop en PNETLab) y espera unos 3 minutos: aparece el problema en Zabbix, el mensaje en Telegram y el panel rojo en Grafana.</p>
+    </div>
+  </article>
+
+  <article class="dev" data-dev="n8n2">
+    <div class="dev-h"><div class="id"><h3>Paso H · importar el flujo del bot</h3><span class="tag t-mon">n8n</span></div>
+      <label class="done"><input type="checkbox" class="chk-dev" id="d-n8n2">Hecho</label></div>
+    <div class="dev-b">
+      <ol class="steps">
+        <li>Abre <b>http://<span class="phi" data-k="WAN"></span>:5678</b> y crea la cuenta de propietario.</li>
+        <li><b>Credentials → Add credential → Telegram API</b> → Access Token = tu token del bot → Save.</li>
+        <li><b>Create workflow</b>, haz clic en el lienzo vacío y pega (Ctrl+V) el JSON de abajo. Aparecen 8 nodos conectados.</li>
+        <li>Abre <b>Telegram Trigger</b> y <b>Responder</b> y en cada uno elige la credencial que creaste.</li>
+        <li><b>Save</b> y activa el flujo (interruptor <i>Active</i>, o <i>Publish</i> en n8n 2.x).</li>
+        <li>En Telegram escribe a tu bot <code>/estado_red</code>, <code>/alertas</code>, <code>/dispositivos_caidos</code>, <code>/zabbix</code>, <code>/grafana</code>, <code>/resumen</code>.</li>
+      </ol>
+      <p>Cómo funciona: <i>Telegram Trigger</i> recibe el comando → <i>Zabbix Login</i> obtiene la sesión de la API → <i>Zabbix Version</i>, <i>Zabbix ICMP</i> (último valor de <code>icmpping</code> de cada equipo) y <i>Zabbix Problemas</i> (disparadores activos) consultan Zabbix → <i>Grafana Health</i> consulta <code>/api/health</code> → <i>Armar respuesta</i> (JavaScript) arma el texto según el comando → <i>Responder</i> lo envía al chat.</p>
+      <div class="code"><div class="cap"><span>Flujo n8n · pegar en el lienzo</span></div><pre><code>{
+ "name": "Bot Redes II - Estado de la red",
+ "nodes": [
+  {
+   "parameters": {
+    "updates": [
+     "message"
+    ],
+    "additionalFields": {}
+   },
+   "id": "a0000000-0000-4000-8000-000000000001",
+   "name": "Telegram Trigger",
+   "type": "n8n-nodes-base.telegramTrigger",
+   "typeVersion": 1.1,
+   "position": [
+    0,
+    0
+   ],
+   "webhookId": "5d1f7c2a-9b3e-4c61-8f0a-2e7b9d4c1a01"
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "http://192.168.99.10/zabbix/api_jsonrpc.php",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "{\"jsonrpc\": \"2.0\", \"method\": \"user.login\", \"params\": {\"username\": \"Admin\", \"password\": \"zabbix\"}, \"id\": 1}",
+    "options": {}
+   },
+   "id": "a0000000-0000-4000-8000-000000000002",
+   "name": "Zabbix Login",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    220,
+    0
+   ]
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "http://192.168.99.10/zabbix/api_jsonrpc.php",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "{\"jsonrpc\": \"2.0\", \"method\": \"apiinfo.version\", \"params\": [], \"id\": 2}",
+    "options": {}
+   },
+   "id": "a0000000-0000-4000-8000-000000000003",
+   "name": "Zabbix Version",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    440,
+    0
+   ]
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "http://192.168.99.10/zabbix/api_jsonrpc.php",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "{\"jsonrpc\": \"2.0\", \"method\": \"item.get\", \"params\": {\"output\": [\"hostid\", \"lastvalue\", \"lastclock\"], \"selectHosts\": [\"name\"], \"filter\": {\"key_\": \"icmpping\"}, \"monitored\": true}, \"id\": 3}",
+    "options": {},
+    "sendHeaders": true,
+    "headerParameters": {
+     "parameters": [
+      {
+       "name": "Authorization",
+       "value": "=Bearer {{ $('Zabbix Login').first().json.result }}"
+      }
+     ]
+    }
+   },
+   "id": "a0000000-0000-4000-8000-000000000004",
+   "name": "Zabbix ICMP",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    660,
+    0
+   ]
+  },
+  {
+   "parameters": {
+    "method": "POST",
+    "url": "http://192.168.99.10/zabbix/api_jsonrpc.php",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "{\"jsonrpc\": \"2.0\", \"method\": \"trigger.get\", \"params\": {\"output\": [\"description\", \"priority\", \"lastchange\"], \"selectHosts\": [\"name\"], \"filter\": {\"value\": 1}, \"monitored\": true, \"skipDependent\": true, \"expandDescription\": true, \"sortfield\": \"priority\", \"sortorder\": \"DESC\"}, \"id\": 4}",
+    "options": {},
+    "sendHeaders": true,
+    "headerParameters": {
+     "parameters": [
+      {
+       "name": "Authorization",
+       "value": "=Bearer {{ $('Zabbix Login').first().json.result }}"
+      }
+     ]
+    }
+   },
+   "id": "a0000000-0000-4000-8000-000000000005",
+   "name": "Zabbix Problemas",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    880,
+    0
+   ]
+  },
+  {
+   "parameters": {
+    "url": "http://192.168.99.10:3000/api/health",
+    "options": {}
+   },
+   "id": "a0000000-0000-4000-8000-000000000006",
+   "name": "Grafana Health",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    1100,
+    0
+   ],
+   "onError": "continueRegularOutput"
+  },
+  {
+   "parameters": {
+    "jsCode": "// URLs que abre tu PC (se llenan con la IP WAN de R2)\nconst ZABBIX_URL = 'http://%%WAN%%:8080/zabbix';\nconst GRAFANA_URL = 'http://%%WAN%%:3000/d/redes2';\n\nconst msg = $('Telegram Trigger').first().json.message || {};\nconst cmd = String(msg.text || '').trim().split(/\\s+/)[0].split('@')[0].toLowerCase();\n\nconst icmp = $('Zabbix ICMP').first().json.result || [];\nconst trig = $('Zabbix Problemas').first().json.result || [];\nconst zver = $('Zabbix Version').first().json.result || 'desconocida';\nconst graf = $('Grafana Health').first().json || {};\n\nconst nombre = (o) =&gt; (o.hosts &amp;&amp; o.hosts[0]) ? o.hosts[0].name : 'host ' + o.hostid;\nconst enLinea = icmp.filter(i =&gt; i.lastvalue === '1').map(nombre).sort();\nconst caidos = icmp.filter(i =&gt; i.lastvalue !== '1').map(nombre).sort();\nconst SEV = ['Sin clasificar', 'Información', 'Advertencia', 'Media', 'Alta', 'Desastre'];\nconst lista = (a) =&gt; a.length ? a.map(x =&gt; '• ' + x).join('\\n') : '(ninguno)';\nconst problemas = trig.map(t =&gt; '• [' + (SEV[Number(t.priority)] || t.priority) + '] ' +\n  ((t.hosts &amp;&amp; t.hosts[0]) ? t.hosts[0].name + ': ' : '') + t.description);\nconst grafOk = graf.database === 'ok';\nconst hora = new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' });\nconst pct = icmp.length ? Math.round(enLinea.length * 100 / icmp.length) : 0;\n\nlet r;\nswitch (cmd) {\n  case '/estado_red':\n    r = '📡 ESTADO DE LA RED\\n' + hora +\n        '\\n\\nEquipos monitoreados: ' + icmp.length +\n        '\\n✅ En línea: ' + enLinea.length +\n        '\\n❌ Caídos: ' + caidos.length +\n        '\\nDisponibilidad: ' + pct + '%' +\n        '\\n\\nEn línea:\\n' + lista(enLinea);\n    break;\n  case '/alertas':\n    r = '🚨 ALERTAS ACTIVAS EN ZABBIX (' + problemas.length + ')\\n\\n' +\n        (problemas.length ? problemas.join('\\n') : 'Sin problemas activos ✅');\n    break;\n  case '/dispositivos_caidos':\n    r = caidos.length\n      ? '❌ DISPOSITIVOS CAÍDOS (' + caidos.length + ')\\n\\n' + lista(caidos)\n      : '✅ Todos los dispositivos responden a ICMP';\n    break;\n  case '/zabbix':\n    r = '🖥️ ZABBIX\\nVersión: ' + zver +\n        '\\nEquipos con ICMP: ' + icmp.length +\n        '\\nProblemas activos: ' + problemas.length +\n        '\\nURL: ' + ZABBIX_URL;\n    break;\n  case '/grafana':\n    r = '📊 GRAFANA\\nEstado: ' + (grafOk ? 'OK ✅' : 'sin respuesta ❌') +\n        '\\nVersión: ' + (graf.version || '?') +\n        '\\nDashboard: ' + GRAFANA_URL;\n    break;\n  case '/resumen':\n    r = '📋 RESUMEN - Proyecto Redes II\\n' + hora +\n        '\\n\\nDisponibilidad: ' + pct + '% (' + enLinea.length + '/' + icmp.length + ')' +\n        '\\nCaídos: ' + (caidos.length ? caidos.join(', ') : 'ninguno') +\n        '\\nAlertas activas: ' + problemas.length +\n        '\\nZabbix ' + zver + ' | Grafana ' + (grafOk ? 'OK' : 'caído') +\n        '\\n\\nDominios: RIPv2 · EIGRP 100 · OSPF multiárea (Cisco + MikroTik)';\n    break;\n  default:\n    r = '🤖 Bot de monitoreo Redes II\\n\\nComandos:\\n/estado_red\\n/alertas\\n/dispositivos_caidos\\n/zabbix\\n/grafana\\n/resumen';\n}\nreturn [{ json: { chatId: msg.chat ? msg.chat.id : null, texto: r } }];\n"
+   },
+   "id": "a0000000-0000-4000-8000-000000000007",
+   "name": "Armar respuesta",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    1320,
+    0
+   ]
+  },
+  {
+   "parameters": {
+    "chatId": "={{ $json.chatId }}",
+    "text": "={{ $json.texto }}",
+    "additionalFields": {
+     "appendAttribution": false
+    }
+   },
+   "id": "a0000000-0000-4000-8000-000000000008",
+   "name": "Responder",
+   "type": "n8n-nodes-base.telegram",
+   "typeVersion": 1.2,
+   "position": [
+    1540,
+    0
+   ]
+  }
+ ],
+ "connections": {
+  "Telegram Trigger": {
+   "main": [
+    [
+     {
+      "node": "Zabbix Login",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Zabbix Login": {
+   "main": [
+    [
+     {
+      "node": "Zabbix Version",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Zabbix Version": {
+   "main": [
+    [
+     {
+      "node": "Zabbix ICMP",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Zabbix ICMP": {
+   "main": [
+    [
+     {
+      "node": "Zabbix Problemas",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Zabbix Problemas": {
+   "main": [
+    [
+     {
+      "node": "Grafana Health",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Grafana Health": {
+   "main": [
+    [
+     {
+      "node": "Armar respuesta",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Armar respuesta": {
+   "main": [
+    [
+     {
+      "node": "Responder",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1"
+ },
+ "pinData": {}
+}</code></pre></div>
+    </div>
+  </article>
+</section>
+
+<!-- ================= 13 TESTS ================= -->
+<section id="tests">
+  <div class="sec-head"><span class="eyebrow">13 · Pruebas</span><h2>Verificación con resultado esperado</h2></div>
+
+  <h3>Conectividad entre dominios</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Desde</th><th>Comando</th><th>Esperado</th></tr></thead>
+    <tbody>
+      <tr><td>PC-MEDELLIN (EIGRP)</td><td class="m">ping 192.168.7.13</td><td class="ok-t">Responde (llega a OSPF área 1, MikroTik)</td></tr>
+      <tr><td>PC-MEDELLIN</td><td class="m">trace 192.168.15.10</td><td>Saltos R8 → R7 → R6 → R1 → CISCOIP-1</td></tr>
+      <tr><td>CISCOIP-1 (RIP)</td><td class="m">ping 192.168.5.11</td><td class="ok-t">Responde (RIP → EIGRP → OSPF)</td></tr>
+      <tr><td>PC-11 (OSPF)</td><td class="m">trace 192.168.10.10</td><td>R11 → R10 → R9 → R3 → … → R1 → R2</td></tr>
+      <tr><td>PC-9</td><td class="m">ping 8.8.8.8</td><td class="ok-t">Responde (ruta por defecto O*E2 → NAT en R2)</td></tr>
+      <tr><td>R9-TUNJA</td><td class="m">show ip route 0.0.0.0</td><td>O*E2 0.0.0.0/0 vía 192.168.24.2</td></tr>
+      <tr><td>R2-PAMPLONA</td><td class="m">show ip nat translations</td><td>Traducciones icmp de IP internas a <span class="phi" data-k="WAN"></span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Políticas de acceso (ACL)</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Regla</th><th>Desde</th><th>Comando</th><th>Esperado</th></tr></thead>
+    <tbody>
+      <tr><td><span class="v10">VLAN 10</span> → VLAN 30</td><td>VPC (10.11)</td><td class="m">ping 192.168.30.12</td><td class="ok-t">Responde</td></tr>
+      <tr><td><span class="v10">VLAN 10</span> → VLAN 20</td><td>VPC (10.11)</td><td class="m">ping 192.168.20.11</td><td class="ok-t">Responde</td></tr>
+      <tr><td><span class="v10">VLAN 10</span> → VLAN 40</td><td>VPC (10.11)</td><td class="m">ping 192.168.40.10</td><td class="bad-t">Falla (nunca)</td></tr>
+      <tr><td><span class="v40">VLAN 40</span> par → web por IP</td><td>VPC3 (40.10)</td><td class="m">ping 192.168.30.2 -P 6 -p 80</td><td class="ok-t">Connect 80@192.168.30.2</td></tr>
+      <tr><td><span class="v40">VLAN 40</span> par → DNS</td><td>VPC3 (40.10)</td><td class="m">ping www.redes2.local -P 6 -p 80</td><td class="bad-t">No resuelve el nombre</td></tr>
+      <tr><td><span class="v40">VLAN 40</span> impar → DNS + web</td><td>VPC12 (40.11)</td><td class="m">ping www.redes2.local -P 6 -p 80</td><td class="ok-t">Resuelve a 192.168.30.2 y conecta</td></tr>
+      <tr><td><span class="v40">VLAN 40</span> → web (otro tráfico)</td><td>VPC12</td><td class="m">ping 192.168.30.2</td><td class="bad-t">Falla: solo HTTP</td></tr>
+      <tr><td>SSH a R2 desde VLAN 40</td><td>SW1 (40.2)</td><td class="m">ssh -l admin 192.168.40.1</td><td class="ok-t">Pide clave y entra</td></tr>
+      <tr><td>SSH a R2 desde otra VLAN</td><td>DNS1 (VLAN 20)</td><td class="m">ssh -l admin 192.168.20.1</td><td class="bad-t">Connection refused</td></tr>
+      <tr><td>Telnet a SW2 desde VLAN 40</td><td>SW1</td><td class="m">telnet 192.168.40.3</td><td class="ok-t">Pide usuario y entra</td></tr>
+      <tr><td>Telnet a SW2 desde otra VLAN</td><td>DNS1</td><td class="m">telnet 192.168.40.3</td><td class="bad-t">Conexión cerrada</td></tr>
+      <tr><td>Contadores de las ACL</td><td>R2</td><td class="m">show access-lists</td><td>Cada regla muestra sus <i>matches</i></td></tr>
+    </tbody>
+  </table></div>
+  <p class="lead" style="font-size:.85rem">En VPCS, <code>ping IP -P 6 -p 80</code> envía una conexión TCP al puerto 80 (HTTP), que es la forma de probar el acceso web sin navegador.</p>
+
+  <h3>EtherChannel y redundancia</h3>
+  <div class="code"><div class="cap"><span>Prueba de caída de un enlace físico</span></div><pre><code>! 1) En VPC4 (VLAN 10, conectado a SW2) deja un ping continuo hacia su gateway:
+ping 192.168.10.1 -t
+! 2) En SW1 tumba uno de los dos enlaces del Po1:
+configure terminal
+interface Ethernet0/2
+ shutdown
+end
+show etherchannel summary
+! 3) El ping sigue respondiendo (quizas pierde 1 paquete). Restaura:
+configure terminal
+interface Ethernet0/2
+ no shutdown
+end</code></pre></div>
+
+  <h3>Comandos de verificación por equipo (capturas)</h3>
+  <div class="mini">
+    <div class="code"><div class="cap"><span>R2 · RIP, NAT, ACL</span></div><pre><code>show ip route
+show ip protocols
+show running-config | section router rip
+show ip nat translations
+show ip nat statistics
+show running-config | include ip nat
+show access-lists
+show ip ssh
+show ip interface brief</code></pre></div>
+    <div class="code"><div class="cap"><span>R1 / R3 · redistribución</span></div><pre><code>show ip route
+show ip protocols
+show running-config | section router
+show running-config | include redistribute
+show ip eigrp neighbors
+show ip ospf neighbor</code></pre></div>
+    <div class="code"><div class="cap"><span>R4–R8 · EIGRP</span></div><pre><code>show ip eigrp neighbors
+show ip eigrp topology
+show ip route eigrp
+show ip protocols
+ping 192.168.7.13
+traceroute 192.168.15.10</code></pre></div>
+    <div class="code"><div class="cap"><span>R9 / R10 · OSPF</span></div><pre><code>show ip ospf neighbor
+show ip ospf database
+show ip route ospf
+show ip ospf border-routers
+show ip protocols
+traceroute 192.168.50.10</code></pre></div>
+    <div class="code"><div class="cap"><span>SW1 / SW2 · EtherChannel</span></div><pre><code>show etherchannel summary
+show interfaces port-channel 1
+show running-config interface port-channel 1
+show spanning-tree
+show vlan brief
+show interfaces trunk</code></pre></div>
+    <div class="code"><div class="cap"><span>SRV-MON · servicios</span></div><pre><code>systemctl status zabbix-server --no-pager
+systemctl status zabbix-agent --no-pager
+systemctl status apache2 --no-pager
+systemctl status mysql --no-pager
+systemctl status grafana-server --no-pager
+curl -I http://localhost:3000
+docker ps
+curl -I http://localhost:5678</code></pre></div>
+  </div>
+</section>
+
+<!-- ================= 14 EVIDENCIAS ================= -->
+<section id="evid">
+  <div class="sec-head"><span class="eyebrow">14 · Evidencias obligatorias</span><h2>Checklist de las 23 capturas del informe</h2></div>
+  <p class="lead">Marca cada una cuando tengas la captura guardada. Nómbralas con el número (ej. <code>07-nat.png</code>) para armar el informe más rápido.</p>
+  <div class="checks" id="checks">
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e1"><span class="num">01</span><span class="what"><b>Topología completa</b><span class="how">Lienzo de PNETLab con todos los nodos encendidos (verdes) y los nombres visibles.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e2"><span class="num">02</span><span class="what"><b>Tabla de direccionamiento IP</b><span class="how">La tabla de la sección 03 + <code>show ip interface brief</code> de R2.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e3"><span class="num">03</span><span class="what"><b>Configuración RIP</b><span class="how">R2 y R1: <code>show running-config | section router rip</code> y <code>show ip protocols</code>.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e4"><span class="num">04</span><span class="what"><b>Configuración EIGRP</b><span class="how">R6 o R4: <code>show running-config | section router eigrp</code>.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e5"><span class="num">05</span><span class="what"><b>Configuración OSPF (multimarca)</b><span class="how">R10: <code>show running-config | section router ospf</code> + R11: <code>/routing ospf instance print</code> y <code>/routing ospf area print</code>.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e6"><span class="num">06</span><span class="what"><b>Redistribución de rutas</b><span class="how">R1 y R3: <code>show running-config | include redistribute</code>. R9: rutas <code>O E2</code>. R2: rutas <code>R</code> de EIGRP y OSPF.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e7"><span class="num">07</span><span class="what"><b>NAT funcional</b><span class="how">R2: <code>show ip nat translations</code> y <code>show ip nat statistics</code> justo después de un <code>ping 8.8.8.8</code> desde un PC.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e8"><span class="num">08</span><span class="what"><b>EtherChannel funcional</b><span class="how">SW1: <code>show etherchannel summary</code> (Po1 SU) + prueba de caída de enlace con el ping sin cortarse.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e9"><span class="num">09</span><span class="what"><b>Ruta por defecto hacia Internet</b><span class="how">R2: <code>S* 0.0.0.0/0</code>; R1: <code>R*</code>; R6: <code>D*EX</code>; R9: <code>O*E2</code>.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e10"><span class="num">10</span><span class="what"><b>Ping entre dominios</b><span class="how">PC-MEDELLIN → PC-11, CISCOIP-1 → PC-9, VPC4 → PC-MEDELLIN, PC-9 → 8.8.8.8.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e11"><span class="num">11</span><span class="what"><b>Traceroute entre dominios</b><span class="how"><code>trace 192.168.7.13</code> desde PC-MEDELLIN y <code>trace 192.168.10.10</code> desde PC-11.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e12"><span class="num">12</span><span class="what"><b>Tablas de enrutamiento</b><span class="how"><code>show ip route</code> en R2, R1, R3, R9 y <code>/ip route print</code> en R11.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e13"><span class="num">13</span><span class="what"><b>Vecindades EIGRP</b><span class="how"><code>show ip eigrp neighbors</code> y <code>show ip eigrp topology</code> en R3 y R6.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e14"><span class="num">14</span><span class="what"><b>Vecindades OSPF</b><span class="how">R10: <code>show ip ospf neighbor</code> (ve a R9 y al MikroTik 11.11.11.11 en FULL) + <code>show ip ospf database</code>.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e15"><span class="num">15</span><span class="what"><b>Funcionamiento de listas de acceso</b><span class="how">Toda la tabla de pruebas ACL (sección 13) + <code>show access-lists</code> con contadores.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e16"><span class="num">16</span><span class="what"><b>Servidor Zabbix instalado</b><span class="how"><code>systemctl status</code> de zabbix-server, zabbix-agent, apache2, mysql + pantalla de inicio de Zabbix.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e17"><span class="num">17</span><span class="what"><b>Hosts monitoreados en Zabbix</b><span class="how">Data collection → Hosts, filtro grupo Redes2: íconos ZBX/SNMP en verde.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e18"><span class="num">18</span><span class="what"><b>Dashboard en Grafana</b><span class="how">Dashboard “Redes II - Estado de la red” con datos.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e19"><span class="num">19</span><span class="what"><b>Integración Zabbix–Grafana</b><span class="how">Data source Zabbix → Save &amp; test en verde.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e20"><span class="num">20</span><span class="what"><b>Alertas por caída de equipos</b><span class="how">Apaga R5 en PNETLab: Monitoring → Problems, mensaje de Zabbix en Telegram y panel rojo en Grafana.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e21"><span class="num">21</span><span class="what"><b>Flujo n8n configurado</b><span class="how">Lienzo con los 8 nodos y el flujo activo; una ejecución exitosa en Executions.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e22"><span class="num">22</span><span class="what"><b>Bot de Telegram funcionando</b><span class="how">Chat con el bot y el menú de comandos.</span></span></label>
+    <label class="ck"><input type="checkbox" class="chk-ev" id="e23"><span class="num">23</span><span class="what"><b>Respuestas del bot sobre el estado de la red</b><span class="how">Los 6 comandos respondidos, y <code>/dispositivos_caidos</code> mostrando R5 mientras está apagado.</span></span></label>
+  </div>
+  <div class="note"><b>Entregables que faltan además de las capturas</b>
+    <ul class="plain">
+      <li>Archivo del lab: en PNETLab, menú del lab → <b>Export</b> (o descarga el .unl).</li>
+      <li>Configuraciones completas: <code>show running-config</code> de cada equipo (MobaXterm → clic derecho → <i>Save terminal text</i>) y los scripts de <code>/root</code> del servidor.</li>
+      <li>Documento PDF + editable y presentación: la sección 00 trae la justificación del diseño y la sección 03 la tabla de direccionamiento.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= 15 FIX ================= -->
+<section id="fix">
+  <div class="sec-head"><span class="eyebrow">15 · Si algo falla</span><h2>Problemas comunes y su arreglo</h2></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Síntoma</th><th>Causa y arreglo</th></tr></thead>
+    <tbody>
+      <tr><td>Al pegar salen <code>% Invalid input</code> o letras comidas</td><td>El IOL no alcanzó a procesar. Vuelve a pegar el mismo bloque (los comandos se pueden repetir). Si un bloque es muy largo, pégalo en dos partes.</td></tr>
+      <tr><td>Al repetir un bloque pregunta <code>Do you really want to replace them? [yes/no]</code></td><td>Es la llave RSA que ya existe. Escribe <code>no</code> y Enter.</td></tr>
+      <tr><td>R2 no recibe IP en e0/3</td><td>Revisa que e0/3 esté cableado a <b>Management(Cloud0)</b>. Prueba <code>shutdown</code> / <code>no shutdown</code> en e0/3. La VM de PNETLab debe tener Internet.</td></tr>
+      <tr><td>Rutas raras o IP duplicada con la red de VMware</td><td>La red NAT de VMware choca con el lab. Cambia la subred de VMnet8 (sección 01).</td></tr>
+      <tr><td>R10 y R11 se quedan en EXSTART / EXCHANGE</td><td>Suele ser la MTU, y R10 ya trae <code>ip ospf mtu-ignore</code>. Si sigue igual, revisa que ether1 tenga 10.0.0.6/30 y que el área del MikroTik sea 0.0.0.1 (<code>/routing ospf area print</code>).</td></tr>
+      <tr><td>R9/R10/R11 no tienen ruta por defecto</td><td>R3 no la tiene. En R1 revisa <code>show ip route 0.0.0.0</code> (debe ser R*). Si R3 sigue sin ella, en R3: <code>router ospf 1</code> → <code>default-information originate always</code>.</td></tr>
+      <tr><td>Host de Zabbix con SNMP en rojo</td><td>Desde SRV-MON: <code>snmpwalk -v2c -c redes2 IP 1.3.6.1.2.1.1</code>. Si no responde, falta la línea <code>snmp-server community redes2 RO 20</code> o no hay ruta hacia ese equipo.</td></tr>
+      <tr><td>ICMP en Zabbix siempre caído</td><td><code>fping 192.168.15.1</code> en SRV-MON. Si fping no existe: <code>apt install -y fping</code> y <code>systemctl restart zabbix-server</code>.</td></tr>
+      <tr><td>n8n: “bad webhook: An HTTPS URL must be provided”</td><td>n8n arrancó sin la URL del túnel. Corre <code>n8n-up.sh</code>, desactiva y activa el flujo.</td></tr>
+      <tr><td>El bot no responde</td><td>En n8n → Executions mira qué nodo falló. Si es <i>Zabbix Login</i>, cambiaste la clave de Admin: actualízala en el JSON del nodo.</td></tr>
+      <tr><td>getUpdates de Telegram da “Conflict”</td><td>Pasa cuando n8n ya registró el webhook; es normal. Usa @userinfobot para el chat ID.</td></tr>
+      <tr><td>Grafana: “Zabbix API error” al probar el data source</td><td>Revisa URL <code>http://127.0.0.1/zabbix/api_jsonrpc.php</code>, usuario Admin y clave zabbix.</td></tr>
+      <tr><td>No abre Zabbix/Grafana/n8n desde Windows</td><td>Verifica <code>show ip nat translations | include 99.10</code> en R2 y que uses la IP WAN de R2 con el puerto correcto (8080, 3000, 5678).</td></tr>
+    </tbody>
+  </table></div>
+</section>
+<!-- ================= 16 PREGUNTAS ================= -->
+<section id="preg">
+  <div class="sec-head"><span class="eyebrow">16 · Sustentación</span><h2>Preguntas probables y cómo responderlas</h2></div>
+  <p class="lead">Lo que más suele preguntar un profesor de redes sobre este montaje. Las respuestas son cortas, para que las digas con tus palabras.</p>
+  <div class="qa">
+    <div class="q"><span class="tag t-eigrp">Redistribución</span><h4>¿Por qué se redistribuye solo en R1 y en R3?</h4><p>Porque cada par de dominios se une por un único router: R1 une RIP con EIGRP y R3 une EIGRP con OSPF. Con un solo punto de redistribución por frontera no hay rutas que vuelvan al dominio de origen, así se evitan bucles y rutas subóptimas.</p></div>
+    <div class="q"><span class="tag t-eigrp">Redistribución</span><h4>¿Qué significa <code>metric 10000 100 255 1 1500</code>?</h4><p>Es la métrica compuesta de EIGRP para las rutas externas: ancho de banda 10000 kbps, retardo 100 (decenas de µs), confiabilidad 255, carga 1 y MTU 1500. EIGRP no puede traducir el costo de OSPF ni los saltos de RIP, así que sin métrica las rutas redistribuidas no se anuncian.</p></div>
+    <div class="q"><span class="tag t-ospf">Redistribución</span><h4>¿Para qué sirve <code>subnets</code> en <code>redistribute eigrp 100 subnets</code>?</h4><p>Hace que OSPF redistribuya también las subredes (por ejemplo las /30 y las /24 de 192.168.x.x), no solo las redes con su máscara de clase. En OSPF aparecen como rutas externas <b>O E2</b>.</p></div>
+    <div class="q"><span class="tag t-rip">Redistribución</span><h4>¿Por qué <code>metric 3</code> al redistribuir hacia RIP?</h4><p>RIP mide en saltos y no entiende la métrica de EIGRP. Se asigna una métrica fija de 3 saltos: es menor a 15 (el límite de RIP) y deja margen para los saltos que se sumen dentro del dominio RIP.</p></div>
+    <div class="q"><span class="tag t-net">Ruta por defecto</span><h4>¿Cómo llega la ruta por defecto hasta Sogamoso?</h4><p>R2 tiene la estática 0.0.0.0/0 hacia Internet y la anuncia por RIP con <code>default-information originate</code>. R1 la recibe como <b>R*</b> y al redistribuir RIP en EIGRP se convierte en <b>D*EX</b>. R3 la tiene en su tabla y con <code>default-information originate</code> la inyecta en OSPF como <b>O*E2</b>. Por eso la redistribución de la ruta por defecto es controlada: solo la origina el borde.</p></div>
+    <div class="q"><span class="tag t-net">Teoría</span><h4>Si una red se aprende por varios protocolos, ¿cuál gana?</h4><p>La de menor distancia administrativa: conectada 0, estática 1, EIGRP interna 90, OSPF 110, RIP 120, EIGRP externa 170. Por eso R1 prefiere la ruta por defecto de RIP (120) antes que una EIGRP externa (170).</p></div>
+    <div class="q"><span class="tag t-ospf">OSPF</span><h4>¿Por qué OSPF multiárea y qué hace R10?</h4><p>Las áreas limitan la inundación de LSA y hacen la base de datos más pequeña. R10 es el <b>ABR</b>: tiene interfaces en el área 0 (backbone) y en el área 1, y resume las rutas entre ellas con LSA tipo 3. Toda área debe tocar el área 0.</p></div>
+    <div class="q"><span class="tag t-ospf">OSPF</span><h4>¿Cómo se elige el router ID?</h4><p>Primero el configurado a mano con <code>router-id</code>; si no hay, la loopback con la IP más alta; si no hay loopback, la interfaz activa con la IP más alta. En el proyecto se pusieron a mano (9.9.9.9, 10.10.10.10, 11.11.11.11) para que sean predecibles.</p></div>
+    <div class="q"><span class="tag t-ospf">Multimarca</span><h4>¿Por qué un Cisco y un MikroTik pueden ser vecinos OSPF?</h4><p>OSPF es un estándar abierto (RFC 2328). Basta con que coincidan el área, la subred, los temporizadores hello/dead (10/40 s), el tipo de red y la MTU. Por la MTU se puso <code>ip ospf mtu-ignore</code> en R10.</p></div>
+    <div class="q"><span class="tag t-ospf">OSPF / EIGRP</span><h4>¿Para qué sirve <code>passive-interface</code>?</h4><p>Hace que el router siga anunciando la red de esa interfaz pero sin enviar hellos ni actualizaciones hacia la LAN. Así nadie puede conectar un equipo en la LAN, formar vecindad e inyectar rutas falsas, y no se gasta ancho de banda.</p></div>
+    <div class="q"><span class="tag t-eigrp">EIGRP</span><h4>¿Qué son el sucesor y el sucesor factible?</h4><p>El sucesor es la mejor ruta (menor distancia factible) y va a la tabla de enrutamiento. El sucesor factible es una ruta de respaldo sin bucles, que cumple la condición de factibilidad (su distancia reportada es menor que la distancia factible del sucesor). DUAL la usa al instante si cae la principal. Se ven con <code>show ip eigrp topology</code>.</p></div>
+    <div class="q"><span class="tag t-eigrp">EIGRP</span><h4>¿Qué debe coincidir para que dos routers sean vecinos EIGRP?</h4><p>El número de sistema autónomo (100), los valores K de la métrica y que estén en la misma subred. Los hellos se envían a la multicast 224.0.0.10.</p></div>
+    <div class="q"><span class="tag t-vlan">ACL</span><h4>¿Cómo hace la ACL para separar IP pares e impares?</h4><p>Con la wildcard: <code>192.168.40.1 0.0.0.254</code>. El 0 en el último bit obliga a que ese bit sea 1 (impar) y los demás bits del último octeto quedan libres, así que coincide con .1, .3, .5, … .255. Las pares no coinciden y caen en el <code>deny</code> hacia el DNS.</p></div>
+    <div class="q"><span class="tag t-vlan">ACL</span><h4>¿Estándar o extendida, y dónde se aplican?</h4><p>La estándar filtra solo por origen. Se usó en las líneas VTY (<code>access-class 10 in</code>) para que solo la VLAN 40 entre por SSH o Telnet. La extendida filtra por origen, destino, protocolo y puerto, y se aplicó de entrada en las subinterfaces de las VLAN 10 y 40, cerca del origen, para descartar el tráfico antes de que cruce la red.</p></div>
+    <div class="q"><span class="tag t-vlan">ACL</span><h4>¿Por qué termina con <code>permit ip any any</code>?</h4><p>Porque toda ACL tiene un <b>deny any implícito</b> al final. Sin esa línea, la VLAN 40 perdería Internet, el acceso a los otros dominios y el SSH a los routers. Las reglas van de lo específico a lo general.</p></div>
+    <div class="q"><span class="tag t-net">NAT</span><h4>¿Qué tipo de NAT se usó?</h4><p><b>PAT</b> (NAT con sobrecarga): todas las redes internas salen con la única IP de e0/3 y se diferencian por puerto. Además hay <b>NAT estática por puerto</b> (port-forward) para publicar Zabbix, Grafana, n8n y SSH del servidor de monitoreo hacia la red externa. inside = interfaces internas, outside = e0/3.</p></div>
+    <div class="q"><span class="tag t-vlan">EtherChannel</span><h4>¿Por qué LACP y modo <code>active</code>?</h4><p>LACP (802.3ad) es estándar, a diferencia de PAgP que es de Cisco. En <code>active</code> el switch negocia por su cuenta. Los puertos deben coincidir en velocidad, dúplex, modo troncal y VLAN permitidas. <code>src-dst-ip</code> reparte el tráfico entre los enlaces según origen y destino, y si cae uno el Po1 sigue arriba con el otro.</p></div>
+    <div class="q"><span class="tag t-vlan">VLAN</span><h4>¿Cómo se enruta entre VLAN y cómo llega el DHCP a otras VLAN?</h4><p>Con router-on-a-stick: R2 tiene una subinterfaz por VLAN con <code>encapsulation dot1Q</code> y es el gateway de cada una. El DHCP está en la VLAN 10, así que en las demás subinterfaces <code>ip helper-address 192.168.10.2</code> convierte el broadcast DHCP en unicast hacia el servidor (relay).</p></div>
+    <div class="q"><span class="tag t-mon">Monitoreo</span><h4>¿Cómo monitorea Zabbix los equipos?</h4><p>Por <b>ICMP</b> (plantilla ICMP Ping, chequeo simple con fping cada minuto) y por <b>SNMP v2c</b> con la comunidad <code>redes2</code>, limitada por ACL al servidor 192.168.99.10. Las plantillas traen los disparadores; “Unavailable by ICMP ping” es la alerta de caída, y Zabbix la envía a Telegram. Además se vigilan los servicios web (TCP 80) y DNS.</p></div>
+    <div class="q"><span class="tag t-mon">Automatización</span><h4>¿Cómo funciona el bot?</h4><p>Telegram envía cada mensaje a un webhook de n8n, que necesita una URL HTTPS pública; por eso se usa un túnel de Cloudflare. El flujo inicia sesión en la API de Zabbix, consulta el último valor de <code>icmpping</code> de cada equipo y los disparadores activos, revisa la salud de Grafana, arma la respuesta según el comando en un nodo de código y la responde en el chat.</p></div>
+    <div class="q"><span class="tag t-mon">Diseño</span><h4>¿Por qué la VLAN 99 si el diagrama no la tenía?</h4><p>El PDF trata Gestión como una zona aparte. Con el servidor en la VLAN 40, la regla “VLAN 10 nunca llega a VLAN 40” le impediría monitorear al DHCP. En una VLAN propia, el monitoreo no interfiere con las políticas de acceso.</p></div>
+  </div>
+</section>
+</main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  const KEYS = { WAN:{id:'in-wan',label:'IP_WAN_R2'}, GW:{id:'in-gw',label:'GATEWAY_WAN'}, BOT:{id:'in-bot',label:'TOKEN_DEL_BOT'}, CHAT:{id:'in-chat',label:'CHAT_ID'} };
+  const RX = /%%(WAN|GW|BOT|CHAT)%%/g;
+  const ls = {
+    get(k){ try { return localStorage.getItem('redes2:'+k) || ''; } catch(e){ return ''; } },
+    set(k,v){ try { localStorage.setItem('redes2:'+k, v); } catch(e){} }
+  };
+  const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const vals = () => { const o = {}; for (const k in KEYS) o[k] = (document.getElementById(KEYS[k].id).value || '').trim(); return o; };
+
+  const blocks = Array.from(document.querySelectorAll('pre > code'));
+  blocks.forEach(c => { c.dataset.src = c.textContent; });
+
+  // botón copiar en cada bloque
+  blocks.forEach(c => {
+    const cap = c.parentElement.previousElementSibling;
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'copy'; btn.textContent = 'Copiar';
+    btn.addEventListener('click', () => copy(c, btn));
+    if (cap && cap.classList.contains('cap')) cap.appendChild(btn);
+  });
+
+  function render(){
+    const v = vals();
+    blocks.forEach(c => {
+      const src = c.dataset.src;
+      if (!RX.test(src)) { RX.lastIndex = 0; return; }
+      RX.lastIndex = 0;
+      c.innerHTML = esc(src).replace(RX, (m,k) => '<mark class="ph' + (v[k] ? ' ok' : '') + '">' + esc(v[k] || ('‹' + KEYS[k].label + '›')) + '</mark>');
+    });
+    document.querySelectorAll('.phi').forEach(s => {
+      const k = s.dataset.k; s.textContent = v[k] || ('‹' + KEYS[k].label + '›'); s.classList.toggle('ok', !!v[k]);
+    });
+  }
+  function textFor(c){
+    const v = vals(); const miss = new Set();
+    const t = c.dataset.src.replace(RX, (m,k) => { if (!v[k]) { miss.add(KEYS[k].label); return '<' + KEYS[k].label + '>'; } return v[k]; });
+    return { t, miss: Array.from(miss) };
+  }
+  let tt;
+  function toast(msg){ const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => el.classList.remove('show'), 2600); }
+  function copy(c, btn){
+    const { t, miss } = textFor(c);
+    const done = () => {
+      btn.textContent = 'Copiado'; btn.classList.add('ok');
+      setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('ok'); }, 1600);
+      toast(miss.length ? 'Copiado. Falta completar arriba: ' + miss.join(', ') : 'Copiado. Pégalo en MobaXterm con clic derecho.');
+    };
+    const fallback = () => {
+      const r = document.createRange(); r.selectNodeContents(c);
+      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      toast('Texto seleccionado: presiona Ctrl+C para copiarlo.');
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, fallback);
+    else fallback();
+  }
+
+  for (const k in KEYS) {
+    const el = document.getElementById(KEYS[k].id);
+    el.value = ls.get(k);
+    el.addEventListener('input', () => { ls.set(k, el.value.trim()); render(); });
+  }
+  render();
+
+  // modo claro / oscuro
+  const root = document.documentElement, mb = document.getElementById('modo');
+  const pintaModo = () => {
+    const osc = root.classList.contains('modo-oscuro');
+    document.getElementById('modo-txt').textContent = osc ? 'Modo claro' : 'Modo oscuro';
+    mb.setAttribute('aria-pressed', osc ? 'true' : 'false');
+  };
+  mb.addEventListener('click', () => { root.classList.toggle('modo-oscuro'); ls.set('modo', root.classList.contains('modo-oscuro') ? 'oscuro' : 'claro'); pintaModo(); });
+  pintaModo();
+
+  // progreso
+  const devs = Array.from(document.querySelectorAll('.chk-dev'));
+  const evs = Array.from(document.querySelectorAll('.chk-ev'));
+  function progress(){
+    const d = devs.filter(x => x.checked).length, e = evs.filter(x => x.checked).length;
+    document.getElementById('p-dev').textContent = 'Pasos completados: ' + d + ' / ' + devs.length;
+    document.getElementById('b-dev').style.width = (100 * d / devs.length) + '%';
+    document.getElementById('p-ev').textContent = 'Evidencias: ' + e + ' / ' + evs.length;
+    document.getElementById('b-ev').style.width = (100 * e / evs.length) + '%';
+  }
+  devs.concat(evs).forEach(x => {
+    x.checked = ls.get('chk:' + x.id) === '1';
+    const card = x.closest('.dev'), row = x.closest('.ck');
+    const paint = () => { if (card) card.classList.toggle('is-done', x.checked); if (row) row.classList.toggle('on', x.checked); };
+    paint();
+    x.addEventListener('change', () => { ls.set('chk:' + x.id, x.checked ? '1' : '0'); paint(); progress(); });
+  });
+  progress();
+})();
+</script>
+
+</body>
+</html>
