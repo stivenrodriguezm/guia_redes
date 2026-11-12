@@ -22,6 +22,8 @@ network:
 NETPLAN
 chmod 600 /etc/netplan/01-redes2.yaml
 netplan apply
+rm -f /etc/resolv.conf
+printf 'nameserver 8.8.8.8\nnameserver 1.1.1.1\n' > /etc/resolv.conf
 timedatectl set-timezone America/Bogota || true
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install -y curl wget gnupg ca-certificates fping snmp jq python3 locales
