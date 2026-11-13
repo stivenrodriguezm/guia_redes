@@ -6,6 +6,9 @@ echo ">> Interfaz detectada: $IF"
 hostnamectl set-hostname srv-mon
 mkdir -p /etc/cloud/cloud.cfg.d /root/netplan-bak
 echo 'network: {config: disabled}' > /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
+if grep -q "dos-nics" /etc/netplan/01-redes2.yaml 2>/dev/null; then
+  echo ">> Red con dos interfaces (lab + Cloud0): se mantiene"
+else
 mv /etc/netplan/*.yaml /root/netplan-bak/ 2>/dev/null || true
 cat > /etc/netplan/01-redes2.yaml <<NETPLAN
 network:
@@ -23,6 +26,7 @@ network:
 NETPLAN
 chmod 600 /etc/netplan/01-redes2.yaml
 netplan apply
+fi
 rm -f /etc/resolv.conf
 printf 'nameserver 8.8.8.8\nnameserver 1.1.1.1\n' > /etc/resolv.conf
 timedatectl set-timezone America/Bogota || true
