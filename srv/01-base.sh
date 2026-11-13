@@ -13,6 +13,7 @@ network:
   ethernets:
     $IF:
       dhcp4: false
+      mtu: 1400
       addresses: [192.168.99.10/24]
       routes:
         - to: 0.0.0.0/0
